@@ -34,3 +34,5 @@ export interface DayEvent {
   durationMinutes: number;
   status: CalendarEventStatus;
 }
+
+export type RunPhase = 'idle' | 'prep' | 'exercise' | 'complete';

@@ -56,3 +56,23 @@ export function computeStreak(entries: HistoryEntry[], today: Date): number {
   }
   return streak;
 }
+
+/** Most recent completion date for a sequence, or undefined if it was never run. */
+export function getLastPracticedDate(entries: HistoryEntry[], sequenceId: string): string | undefined {
+  return entries
+    .filter((entry) => entry.sequenceId === sequenceId)
+    .map((entry) => entry.dateISO)
+    .sort()
+    .at(-1);
+}
+
+/** Short Polish "time ago" label for the recent-sequences list, e.g. "wczoraj", "3 dni temu". */
+export function formatRelativeDays(dateISO: string, today: Date): string {
+  const days = Math.round((today.getTime() - parseISODate(dateISO).getTime()) / 86_400_000);
+  if (days <= 0) return 'dzisiaj';
+  if (days === 1) return 'wczoraj';
+  if (days < 7) return `${days} dni temu`;
+  if (days < 14) return 'tydzień temu';
+  if (days < 30) return `${Math.floor(days / 7)} tygodnie temu`;
+  return 'miesiąc temu';
+}
