@@ -8,6 +8,7 @@ import { useRunTimer } from '@/hooks/useRunTimer';
 import { useHistoryStore, useSequencesStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
 import { splitExerciseName } from '@/utils/exercise';
+import { goBack } from '@/utils/navigation';
 import { formatDuration } from '@/utils/time';
 
 export default function RunScreen() {
@@ -30,7 +31,7 @@ export default function RunScreen() {
     return (
       <View style={styles.root}>
         <View style={[styles.topBar, { paddingTop: insets.top }]}>
-          <IconButton onPress={() => router.back()} accessibilityLabel="Zamknij">
+          <IconButton onPress={goBack} accessibilityLabel="Zamknij">
             <CloseIcon />
           </IconButton>
         </View>
@@ -52,7 +53,7 @@ export default function RunScreen() {
     <View style={styles.root}>
       <View style={[styles.topBar, { paddingTop: insets.top }]}>
         <View style={styles.topBarRow}>
-          <IconButton onPress={() => router.back()} accessibilityLabel="Zamknij">
+          <IconButton onPress={goBack} accessibilityLabel="Zamknij">
             <CloseIcon size={14} />
           </IconButton>
           <Text style={styles.progressLabel}>

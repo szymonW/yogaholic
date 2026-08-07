@@ -1,5 +1,20 @@
-import type { DayEvent } from '@/types';
-import { computeHourRange, getMonthCells, getMonthLabel, getWeekDays } from './calendar';
+import type { DayEvent, HistoryEntry } from '@/types';
+import {
+  computeHourRange,
+  getDoneDaysInMonth,
+  getEventBlockPosition,
+  getHourLabels,
+  getMonthCells,
+  getMonthLabel,
+  getWeekDays,
+  historyToDayEvents,
+} from './calendar';
+
+const historyEntry = (dateISO: string, hour: number, minute: number, durationSeconds: number, sequenceId = 's1'): HistoryEntry => {
+  const [year, month, day] = dateISO.split('-').map(Number);
+  const startedAtMs = new Date(year, month - 1, day, hour, minute).getTime();
+  return { id: `${sequenceId}-${dateISO}`, sequenceId, dateISO, startedAtMs, durationSeconds, exerciseCount: 4 };
+};
 
 describe('getWeekDays', () => {
   it('returns 2*radius+1 days centered on today with correct letters', () => {
@@ -75,5 +90,63 @@ describe('getMonthCells', () => {
     const cells = getMonthCells(new Date(2026, 7, 5), new Set(), new Set());
     const dayCells = cells.filter((c) => c.day !== null);
     expect(dayCells).toHaveLength(31); // August has 31 days
+  });
+});
+
+describe('historyToDayEvents', () => {
+  it('converts each entry into a "done" DayEvent keyed by its date', () => {
+    const entries = [historyEntry('2026-08-05', 7, 30, 300)];
+    const map = historyToDayEvents(entries);
+    expect(map.get('2026-08-05')).toEqual([{ hour: 7, minute: 30, durationMinutes: 5, status: 'done' }]);
+  });
+
+  it('groups multiple sessions on the same day', () => {
+    const entries = [historyEntry('2026-08-05', 7, 0, 300), historyEntry('2026-08-05', 18, 0, 600)];
+    expect(historyToDayEvents(entries).get('2026-08-05')).toHaveLength(2);
+  });
+
+  it('skips entries with a missing/invalid startedAtMs instead of producing NaN events', () => {
+    const legacyEntry: HistoryEntry = {
+      id: 'h1',
+      sequenceId: 's1',
+      dateISO: '2026-08-05',
+      startedAtMs: NaN,
+      durationSeconds: 300,
+      exerciseCount: 4,
+    };
+    expect(historyToDayEvents([legacyEntry]).get('2026-08-05')).toBeUndefined();
+  });
+});
+
+describe('getDoneDaysInMonth', () => {
+  it('only counts entries within today\'s month', () => {
+    const today = new Date(2026, 7, 5);
+    const entries = [historyEntry('2026-08-01', 7, 0, 300), historyEntry('2026-08-04', 7, 0, 300), historyEntry('2026-07-31', 7, 0, 300)];
+    expect(getDoneDaysInMonth(entries, today)).toEqual(new Set([1, 4]));
+  });
+});
+
+describe('getHourLabels', () => {
+  it('spaces labels using a step that keeps at most 5 of them', () => {
+    const labels = getHourLabels(6, 22, 11);
+    expect(labels.map((l) => l.label)).toEqual(['6:00', '10:00', '14:00', '18:00', '22:00']);
+    expect(labels[1].topPx).toBe(44); // (10-6)*11
+  });
+
+  it('always includes the start hour even for a narrow range', () => {
+    const labels = getHourLabels(9, 10, 11);
+    expect(labels[0]).toEqual({ label: '9:00', topPx: 0 });
+  });
+});
+
+describe('getEventBlockPosition', () => {
+  it('positions a block from its hour/minute offset and duration', () => {
+    const event: DayEvent = { hour: 8, minute: 30, durationMinutes: 30, status: 'done' };
+    expect(getEventBlockPosition(event, 7, 11)).toEqual({ topPx: 16.5, heightPx: 9 });
+  });
+
+  it('enforces a minimum visible height for very short sessions', () => {
+    const event: DayEvent = { hour: 7, minute: 0, durationMinutes: 5, status: 'done' };
+    expect(getEventBlockPosition(event, 7, 11).heightPx).toBe(9);
   });
 });

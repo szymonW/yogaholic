@@ -1,11 +1,11 @@
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components';
 import { useExercisePoolStore } from '@/store';
 import { colors, radius, spacing, typography } from '@/theme';
+import { goBack } from '@/utils/navigation';
 
 const DURATION_MIN = 5;
 
@@ -29,7 +29,7 @@ export default function CreateExerciseModal() {
   const handleSave = () => {
     if (!canSave) return;
     addExercise({ name: name.trim(), duration: durationNumber, imageUri });
-    router.back();
+    goBack();
   };
 
   return (
@@ -71,7 +71,7 @@ export default function CreateExerciseModal() {
       </View>
 
       <View style={styles.actions}>
-        <Button title="Anuluj" variant="secondary" size="sm" style={styles.flex1} onPress={() => router.back()} />
+        <Button title="Anuluj" variant="secondary" size="sm" style={styles.flex1} onPress={goBack} />
         <Button title="Zapisz" size="sm" style={styles.flex1} disabled={!canSave} onPress={handleSave} />
       </View>
     </View>

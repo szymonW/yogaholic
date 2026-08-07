@@ -14,6 +14,7 @@ const entry = (dateISO: string, durationSeconds = 300, sequenceId = 's1'): Histo
   id: `${sequenceId}-${dateISO}`,
   sequenceId,
   dateISO,
+  startedAtMs: parseISODate(dateISO).getTime(),
   durationSeconds,
   exerciseCount: 4,
 });

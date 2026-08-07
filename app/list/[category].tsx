@@ -5,6 +5,7 @@ import { selectSequencesForCategory, useHistoryStore, useSequencesStore } from '
 import { colors, spacing } from '@/theme';
 import type { SequenceCategory } from '@/types';
 import { formatRelativeDays, getLastPracticedDate } from '@/utils/history';
+import { goBack } from '@/utils/navigation';
 import { totalDuration } from '@/utils/time';
 
 const CATEGORY_LABELS: Record<SequenceCategory, string> = {
@@ -30,7 +31,7 @@ export default function ListScreen() {
 
   return (
     <View style={styles.root}>
-      <ScreenHeader title={label} onBack={() => router.back()} />
+      <ScreenHeader title={label} onBack={goBack} />
       <ScrollView contentContainerStyle={styles.content}>
         {isCustom ? (
           <>

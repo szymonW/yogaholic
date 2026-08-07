@@ -1,10 +1,10 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, ScreenHeader } from '@/components';
 import { selectAllExercises, useExercisePoolStore, useSequencesStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import type { Exercise } from '@/types';
+import { goBack } from '@/utils/navigation';
 import { formatDuration } from '@/utils/time';
 
 const DURATION_STEP = 5;
@@ -29,12 +29,12 @@ export default function CreateSequenceScreen() {
   const handleSave = () => {
     if (!canSave) return;
     addCustomSequence({ title: name.trim(), exercises: items });
-    router.back();
+    goBack();
   };
 
   return (
     <View style={styles.root}>
-      <ScreenHeader title="Nowa sekwencja" size="h2" onBack={() => router.back()} />
+      <ScreenHeader title="Nowa sekwencja" size="h2" onBack={goBack} />
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.field}>

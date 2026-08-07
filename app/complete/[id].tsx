@@ -6,6 +6,7 @@ import { useRunStore } from '@/store/runStore';
 import { useSequencesStore } from '@/store/sequencesStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { colors, spacing, typography } from '@/theme';
+import { goBack } from '@/utils/navigation';
 import { totalDuration } from '@/utils/time';
 
 export default function CompleteScreen() {
@@ -30,7 +31,7 @@ export default function CompleteScreen() {
 
   const handleBackToList = () => {
     useRunStore.getState().reset();
-    router.back();
+    goBack();
   };
 
   return (

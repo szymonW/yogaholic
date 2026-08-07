@@ -22,6 +22,8 @@ export interface HistoryEntry {
   sequenceId: string;
   /** ISO date string (yyyy-mm-dd) the session was completed on */
   dateISO: string;
+  /** ms epoch, approximated as completion time minus durationSeconds — used to place the session on the calendar's hourly grid */
+  startedAtMs: number;
   durationSeconds: number;
   exerciseCount: number;
 }

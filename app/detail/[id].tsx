@@ -5,6 +5,7 @@ import { Button, IconButton } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
 import { useSequencesStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
+import { goBack } from '@/utils/navigation';
 import { formatDuration, totalDuration } from '@/utils/time';
 
 export default function DetailScreen() {
@@ -16,7 +17,7 @@ export default function DetailScreen() {
     return (
       <View style={styles.root}>
         <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-          <IconButton onPress={() => router.back()} accessibilityLabel="Wstecz">
+          <IconButton onPress={goBack} accessibilityLabel="Wstecz">
             <ChevronLeftIcon />
           </IconButton>
         </View>
@@ -30,7 +31,7 @@ export default function DetailScreen() {
   return (
     <View style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-        <IconButton onPress={() => router.back()} accessibilityLabel="Wstecz">
+        <IconButton onPress={goBack} accessibilityLabel="Wstecz">
           <ChevronLeftIcon />
         </IconButton>
         <Text style={[typography.h2, styles.title]}>{sequence.title}</Text>
