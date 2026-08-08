@@ -11,5 +11,6 @@ export { TrashIcon } from './TrashIcon';
 export { PlayIcon } from './PlayIcon';
 export { PauseIcon } from './PauseIcon';
 export { SkipIcon } from './SkipIcon';
+export { PreviousIcon } from './PreviousIcon';
 export { CheckIcon } from './CheckIcon';
 export type { IconProps } from './types';
