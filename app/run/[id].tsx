@@ -10,7 +10,7 @@ import { IconButton, ProgressBar, RingTimer } from '@/components';
 import { CloseIcon, PauseIcon, PlayIcon, SkipIcon } from '@/components/icons';
 import { useCastRunChannel } from '@/hooks/useCastRunChannel';
 import { useRunTimer } from '@/hooks/useRunTimer';
-import { useHistoryStore, useSequencesStore } from '@/store';
+import { useHistoryStore, useSequencesStore, useSettingsStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
 import { splitExerciseName } from '@/utils/exercise';
 import { goBack } from '@/utils/navigation';
@@ -27,6 +27,7 @@ export default function RunScreen() {
   const { phase, runIndex, paused, exercises, currentExercise, remainingSeconds, exerciseProgress, overallProgress, togglePause, skip } =
     useRunTimer(sequence);
 
+  const instructorVoiceEnabled = useSettingsStore((state) => state.instructorVoiceEnabled);
   const prepBeep = useAudioPlayer(PREP_BEEP_SOUND);
   const { isCasting, sendRunState } = useCastRunChannel();
 
@@ -41,10 +42,10 @@ export default function RunScreen() {
   // One beep per counted-down second, only during the "Przygotuj się" prep phase — never during
   // the exercise itself.
   useEffect(() => {
-    if (phase !== 'prep') return;
+    if (phase !== 'prep' || !instructorVoiceEnabled) return;
     prepBeep.seekTo(0);
     prepBeep.play();
-  }, [phase, remainingSeconds, prepBeep]);
+  }, [phase, remainingSeconds, instructorVoiceEnabled, prepBeep]);
 
   // Mirrors the phone's timer state to the connected Chromecast receiver, once per tick.
   useEffect(() => {

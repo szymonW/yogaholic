@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, Easing, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { colors } from '@/theme';
 
@@ -23,6 +23,42 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, blinkKey, chi
   const ringOpacity = useRef(new Animated.Value(1)).current;
   const isFirstBlink = useRef(true);
 
+  // Ticks arrive once per second, but interpolating toward each new value over that same
+  // second (instead of snapping) makes the fill read as continuous motion rather than a
+  // once-a-second jump. Backward jumps (new exercise, skip) snap instantly instead —
+  // animating those would look like the ring rewinding.
+  //
+  // Driven via setNativeProps (rather than Animated.createAnimatedComponent) because
+  // react-native-web's Animated HOC injects a `collapsable` prop meant for Views, which
+  // react-native-svg's web Circle forwards straight to the DOM as an invalid SVG attribute.
+  const progressAnim = useRef(new Animated.Value(clamped)).current;
+  const prevProgress = useRef(clamped);
+  const progressCircleRef = useRef<Circle>(null);
+
+  useEffect(() => {
+    const id = progressAnim.addListener(({ value }) => {
+      progressCircleRef.current?.setNativeProps({ strokeDashoffset: circumference * (1 - value) });
+    });
+    return () => progressAnim.removeListener(id);
+  }, [progressAnim, circumference]);
+
+  useEffect(() => {
+    const prev = prevProgress.current;
+    prevProgress.current = clamped;
+    if (clamped < prev - 0.001) {
+      progressAnim.setValue(clamped);
+      return;
+    }
+    Animated.timing(progressAnim, {
+      toValue: clamped,
+      duration: 1000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start();
+  }, [clamped, progressAnim]);
+
+  const initialStrokeDashoffset = useRef(circumference * (1 - clamped)).current;
+
   useEffect(() => {
     if (blinkKey === undefined) return;
     if (isFirstBlink.current) {
@@ -42,6 +78,7 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, blinkKey, chi
         <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
           <Circle cx={center} cy={center} r={radius} stroke={colors.ringTrack} strokeWidth={strokeWidth} fill="none" />
           <Circle
+            ref={progressCircleRef}
             cx={center}
             cy={center}
             r={radius}
@@ -50,7 +87,7 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, blinkKey, chi
             fill="none"
             strokeLinecap="round"
             strokeDasharray={`${circumference} ${circumference}`}
-            strokeDashoffset={circumference * (1 - clamped)}
+            strokeDashoffset={initialStrokeDashoffset}
           />
         </Svg>
       </Animated.View>
