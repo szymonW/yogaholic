@@ -1,0 +1,139 @@
+/* Hex values copied from src/theme/colors.ts to keep the TV view visually consistent with the phone. */
+:root {
+  --background: #fbf4eb;
+  --ring-track: #e9d7c9;
+  --ring-inner: #eddaca;
+  --accent: #b95c3a;
+  --text-primary: #38231c;
+  --text-secondary: #78645a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+.top-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--ring-track);
+}
+
+.top-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s linear;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2vh;
+  padding: 6vh 6vw;
+  text-align: center;
+}
+
+.ring-wrap {
+  position: relative;
+  width: 36vh;
+  height: 36vh;
+  max-width: 440px;
+  max-height: 440px;
+}
+
+.ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--ring-track);
+  stroke-width: 7;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s linear;
+}
+
+.ring-inner {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: var(--ring-inner);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.exercise-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.exercise-placeholder {
+  font-family: monospace;
+  font-size: 1.6vh;
+  color: var(--text-secondary);
+  text-align: center;
+  text-transform: lowercase;
+  padding: 0 12%;
+}
+
+.exercise-name {
+  font-size: 4.4vh;
+  font-weight: 700;
+  margin: 1vh 0 0;
+}
+
+.exercise-original {
+  font-size: 2.4vh;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.phase-caption {
+  font-size: 2.2vh;
+  color: var(--text-secondary);
+  margin: 1vh 0 0;
+}
+
+.time-big {
+  font-size: 9vh;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.step-label {
+  font-size: 2vh;
+  color: var(--text-secondary);
+  margin: 1vh 0 0;
+}

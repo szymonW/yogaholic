@@ -2,9 +2,13 @@ import { useAudioPlayer } from 'expo-audio';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { CastButton } from 'react-native-google-cast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { EXERCISE_IMAGE_SLUGS } from '@/cast/imageSlugs';
+import { buildCastRunPayload, CAST_COMPLETE_MESSAGE } from '@/cast/payload';
 import { IconButton, ProgressBar, RingTimer } from '@/components';
 import { CloseIcon, PauseIcon, PlayIcon, SkipIcon } from '@/components/icons';
+import { useCastRunChannel } from '@/hooks/useCastRunChannel';
 import { useRunTimer } from '@/hooks/useRunTimer';
 import { useHistoryStore, useSequencesStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
@@ -24,13 +28,15 @@ export default function RunScreen() {
     useRunTimer(sequence);
 
   const prepBeep = useAudioPlayer(PREP_BEEP_SOUND);
+  const { isCasting, sendRunState } = useCastRunChannel();
 
   useEffect(() => {
     if (phase !== 'complete' || !sequence) return;
+    if (isCasting) sendRunState(CAST_COMPLETE_MESSAGE);
     const durationSeconds = exercises.reduce((sum, exercise) => sum + exercise.duration, 0);
     logSession({ sequenceId: sequence.id, durationSeconds, exerciseCount: exercises.length });
     router.replace(`/complete/${sequence.id}`);
-  }, [phase, sequence, exercises, logSession]);
+  }, [phase, sequence, exercises, logSession, isCasting, sendRunState]);
 
   // One beep per counted-down second, only during the "Przygotuj się" prep phase — never during
   // the exercise itself.
@@ -39,6 +45,23 @@ export default function RunScreen() {
     prepBeep.seekTo(0);
     prepBeep.play();
   }, [phase, remainingSeconds, prepBeep]);
+
+  // Mirrors the phone's timer state to the connected Chromecast receiver, once per tick.
+  useEffect(() => {
+    if (!isCasting || !currentExercise) return;
+    sendRunState(
+      buildCastRunPayload({
+        phase,
+        runIndex,
+        exerciseCount: exercises.length,
+        currentExerciseName: currentExercise.name,
+        remainingSeconds,
+        exerciseProgress,
+        overallProgress,
+        imageSlug: EXERCISE_IMAGE_SLUGS[currentExercise.name],
+      })
+    );
+  }, [isCasting, sendRunState, phase, runIndex, exercises.length, currentExercise, remainingSeconds, exerciseProgress, overallProgress]);
 
   if (!sequence) {
     return (
@@ -72,7 +95,7 @@ export default function RunScreen() {
           <Text style={styles.progressLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
             Ćwiczenie {runIndex + 1} z {exercises.length}
           </Text>
-          <View style={styles.spacer} />
+          <CastButton style={styles.castButton} tintColor={colors.textPrimary} />
         </View>
         <ProgressBar progress={overallProgress} height={4} trackColor={colors.border} style={styles.topProgress} />
       </View>
@@ -122,7 +145,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   topBar: { paddingHorizontal: spacing.xl },
   topBarRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  spacer: { width: 36 },
+  castButton: { width: 36, height: 36 },
   controlSpacer: { width: 52, height: 52 },
   // flexShrink gives adjustsFontSizeToFit a bounded box to shrink within — combined with
   // numberOfLines=1, the whole "Ćwiczenie X z Y" stays on one line and fully visible (shrinking

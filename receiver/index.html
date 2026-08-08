@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Yogaholic — Cast</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+  </head>
+  <body>
+    <div id="topProgress" class="top-progress"><div id="overallProgress" class="top-progress-fill"></div></div>
+
+    <main id="root">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 264 264">
+          <circle class="ring-track" cx="132" cy="132" r="130.5" />
+          <circle id="ringFill" class="ring-fill" cx="132" cy="132" r="130.5" />
+        </svg>
+        <div class="ring-inner">
+          <img id="exerciseImage" class="exercise-image" alt="" hidden />
+          <div id="exercisePlaceholder" class="exercise-placeholder"></div>
+        </div>
+      </div>
+
+      <h1 id="exerciseName" class="exercise-name">Yogaholic</h1>
+      <p id="exerciseOriginal" class="exercise-original" hidden></p>
+      <p id="phaseCaption" class="phase-caption">Oczekiwanie na telefon&hellip;</p>
+      <p id="timeBig" class="time-big">--:--</p>
+      <p id="stepLabel" class="step-label"></p>
+    </main>
+
+    <script src="receiver.js"></script>
+  </body>
+</html>
