@@ -2,8 +2,8 @@ import { useAudioPlayer } from 'expo-audio';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { CastButton } from 'react-native-google-cast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CastButtonSafe } from '@/cast/CastButtonSafe';
 import { EXERCISE_IMAGE_SLUGS } from '@/cast/imageSlugs';
 import { buildCastRunPayload, CAST_COMPLETE_MESSAGE } from '@/cast/payload';
 import { IconButton, ProgressBar, RingTimer } from '@/components';
@@ -95,7 +95,7 @@ export default function RunScreen() {
           <Text style={styles.progressLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
             Ćwiczenie {runIndex + 1} z {exercises.length}
           </Text>
-          <CastButton style={styles.castButton} tintColor={colors.textPrimary} />
+          <CastButtonSafe style={styles.castButton} tintColor={colors.textPrimary} />
         </View>
         <ProgressBar progress={overallProgress} height={4} trackColor={colors.border} style={styles.topProgress} />
       </View>
