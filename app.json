@@ -37,7 +37,8 @@
       "expo-router",
       "expo-status-bar",
       "expo-audio",
-      "react-native-google-cast"
+      ["react-native-google-cast", { "receiverAppId": "D60542CE" }],
+      "./plugins/withCastNearbyWifiPermission.js"
     ],
     "experiments": {
       "typedRoutes": true

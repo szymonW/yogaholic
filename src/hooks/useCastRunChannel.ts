@@ -1,9 +1,18 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { PermissionsAndroid, Platform } from 'react-native';
 import { CastState, useCastChannel, useCastState } from 'react-native-google-cast';
 import { RUN_CAST_NAMESPACE, type CastMessage } from '@/cast/payload';
 
 /** Tracks the Cast connection and exposes a sender bound to the run-state channel. */
 export function useCastRunChannel() {
+  // Android 13+ requires this runtime permission for Wi-Fi-based Cast device discovery — without
+  // it, react-native-google-cast silently finds zero devices. See plugins/withCastNearbyWifiPermission.js
+  // for the matching manifest declaration.
+  useEffect(() => {
+    if (Platform.OS !== 'android' || Platform.Version < 33) return;
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES);
+  }, []);
+
   const castState = useCastState();
   const isCasting = castState === CastState.CONNECTED;
   const channel = useCastChannel(RUN_CAST_NAMESPACE);
