@@ -101,7 +101,10 @@ export default function RunScreen() {
       </View>
 
       <View style={styles.center}>
-        <RingTimer progress={isPrep ? 0 : exerciseProgress}>
+        <RingTimer
+          progress={isPrep ? 0 : exerciseProgress}
+          blinkKey={isPrep ? `prep-${remainingSeconds}` : `exercise-${runIndex}`}
+        >
           {currentExercise.imageUri ? (
             <Image source={currentExercise.imageUri} style={styles.illustrationImage} resizeMode="cover" />
           ) : (
