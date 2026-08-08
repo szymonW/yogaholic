@@ -7,7 +7,7 @@ import { CastButtonSafe } from '@/cast/CastButtonSafe';
 import { EXERCISE_IMAGE_SLUGS } from '@/cast/imageSlugs';
 import { buildCastRunPayload, CAST_COMPLETE_MESSAGE } from '@/cast/payload';
 import { IconButton, ProgressBar, RingTimer } from '@/components';
-import { CloseIcon, PauseIcon, PlayIcon, SkipIcon } from '@/components/icons';
+import { CloseIcon, PauseIcon, PlayIcon, PreviousIcon, SkipIcon } from '@/components/icons';
 import { useCastRunChannel } from '@/hooks/useCastRunChannel';
 import { useRunTimer } from '@/hooks/useRunTimer';
 import { useHistoryStore, useSequencesStore, useSettingsStore } from '@/store';
@@ -24,8 +24,20 @@ export default function RunScreen() {
   const sequence = useSequencesStore((state) => state.getById(id));
   const logSession = useHistoryStore((state) => state.logSession);
 
-  const { phase, runIndex, paused, exercises, currentExercise, remainingSeconds, exerciseProgress, overallProgress, togglePause, skip } =
-    useRunTimer(sequence);
+  const {
+    phase,
+    runIndex,
+    paused,
+    exercises,
+    currentExercise,
+    remainingSeconds,
+    exerciseProgress,
+    overallProgress,
+    togglePause,
+    skip,
+    previous,
+    canGoPrevious,
+  } = useRunTimer(sequence);
 
   const instructorVoiceEnabled = useSettingsStore((state) => state.instructorVoiceEnabled);
   const prepBeep = useAudioPlayer(PREP_BEEP_SOUND);
@@ -127,7 +139,16 @@ export default function RunScreen() {
       </View>
 
       <View style={styles.controls}>
-        <View style={styles.controlSpacer} />
+        <IconButton
+          onPress={previous}
+          disabled={!canGoPrevious}
+          accessibilityLabel="Poprzednie ćwiczenie"
+          size={52}
+          backgroundColor={colors.surfaceAlt}
+          style={styles.skipButton}
+        >
+          <PreviousIcon />
+        </IconButton>
         <IconButton
           onPress={togglePause}
           accessibilityLabel={paused ? 'Wznów' : 'Pauza'}
@@ -150,7 +171,6 @@ const styles = StyleSheet.create({
   topBar: { paddingHorizontal: spacing.xl },
   topBarRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   castButton: { width: 36, height: 36 },
-  controlSpacer: { width: 52, height: 52 },
   // flexShrink gives adjustsFontSizeToFit a bounded box to shrink within — combined with
   // numberOfLines=1, the whole "Ćwiczenie X z Y" stays on one line and fully visible (shrinking
   // the font instead of wrapping/truncating) even under large accessibility font sizes.
@@ -165,7 +185,7 @@ const styles = StyleSheet.create({
   exerciseName: { fontSize: 24, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginTop: spacing.xxs, width: '100%' },
   exerciseOriginal: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', width: '100%' },
   phaseCaption: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', width: '100%' },
-  timeBig: { fontSize: 52, fontWeight: '700', color: colors.accent, fontVariant: ['tabular-nums'] },
+  timeBig: { fontSize: 91, fontWeight: '700', color: colors.accent, fontVariant: ['tabular-nums'] },
   controls: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -19,10 +19,11 @@ interface RunState {
   tick: () => void;
   togglePause: () => void;
   skip: () => void;
+  previous: () => void;
   reset: () => void;
 }
 
-const IDLE: Omit<RunState, 'start' | 'tick' | 'togglePause' | 'skip' | 'reset'> = {
+const IDLE: Omit<RunState, 'start' | 'tick' | 'togglePause' | 'skip' | 'previous' | 'reset'> = {
   sequenceId: null,
   exercises: [],
   prepSeconds: 0,
@@ -102,6 +103,14 @@ export const useRunStore = create<RunState>()((set, get) => ({
       return;
     }
     set({ runIndex: nextIndex, phase: 'prep', phaseEndsAt: now + state.prepSeconds * 1000, paused: false, now });
+  },
+
+  previous: () => {
+    const state = get();
+    if (state.phase !== 'prep' && state.phase !== 'exercise') return;
+    if (state.runIndex <= 0) return;
+    const now = Date.now();
+    set({ runIndex: state.runIndex - 1, phase: 'prep', phaseEndsAt: now + state.prepSeconds * 1000, paused: false, now });
   },
 
   reset: () => set({ ...IDLE, now: Date.now() }),

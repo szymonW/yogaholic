@@ -7,6 +7,7 @@ interface IconButtonProps {
   accessibilityLabel: string;
   size?: number;
   backgroundColor?: string;
+  disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -16,17 +17,20 @@ export function IconButton({
   accessibilityLabel,
   size = 36,
   backgroundColor = colors.surface,
+  disabled = false,
   style,
 }: IconButtonProps) {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled }}
       hitSlop={8}
       style={({ pressed }) => [
         styles.base,
-        { width: size, height: size, borderRadius: size / 2, backgroundColor, opacity: pressed ? 0.7 : 1 },
+        { width: size, height: size, borderRadius: size / 2, backgroundColor, opacity: disabled ? 0.35 : pressed ? 0.7 : 1 },
         style,
       ]}
     >

@@ -59,5 +59,7 @@ export function useRunTimer(sequence: Sequence | undefined) {
     overallProgress: getOverallProgress(snapshot),
     togglePause: () => useRunStore.getState().togglePause(),
     skip: () => useRunStore.getState().skip(),
+    previous: () => useRunStore.getState().previous(),
+    canGoPrevious: runIndex > 0,
   };
 }
