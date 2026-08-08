@@ -123,6 +123,12 @@ describe('formatRelativeDays', () => {
     expect(formatRelativeDays('2026-08-02', today)).toBe('3 dni temu');
   });
 
+  it('still says "dzisiaj"/"wczoraj" late in the day, not a day early', () => {
+    const lateAfternoon = new Date(2026, 7, 5, 18, 30); // same calendar day, well past the 12h midpoint
+    expect(formatRelativeDays('2026-08-05', lateAfternoon)).toBe('dzisiaj');
+    expect(formatRelativeDays('2026-08-04', lateAfternoon)).toBe('wczoraj');
+  });
+
   it('buckets into weeks and months beyond that', () => {
     expect(formatRelativeDays('2026-07-27', today)).toBe('tydzień temu');
     expect(formatRelativeDays('2026-07-20', today)).toBe('2 tygodnie temu');

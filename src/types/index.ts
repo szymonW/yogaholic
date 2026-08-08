@@ -1,9 +1,11 @@
+import type { ImageSourcePropType } from 'react-native';
+
 export interface Exercise {
   name: string;
   /** seconds */
   duration: number;
-  /** local URI for custom exercises added via the image picker */
-  imageUri?: string;
+  /** picker-selected URI for custom exercises, or a bundled asset (require(...)) for seed exercises */
+  imageUri?: ImageSourcePropType;
 }
 
 export type SequenceTag = 'sample' | 'saved';

@@ -55,6 +55,21 @@ describe('useSequencesStore', () => {
     expect(useSequencesStore.getState().getById(created.id)?.title).toBe('Testowa sekwencja');
   });
 
+  it('updateCustomSequence replaces title and exercises for the targeted sequence only', () => {
+    useSequencesStore.getState().updateCustomSequence('c1', {
+      title: 'Zaktualizowana nazwa',
+      exercises: [{ name: 'Nowa pozycja', duration: 25 }],
+    });
+    const state = useSequencesStore.getState();
+    expect(state.getById('c1')).toEqual({ id: 'c1', title: 'Zaktualizowana nazwa', exercises: [{ name: 'Nowa pozycja', duration: 25 }] });
+    expect(state.getById('c2')?.title).toBe('Szybki reset');
+  });
+
+  it('updateCustomSequence is a no-op for an unknown id', () => {
+    useSequencesStore.getState().updateCustomSequence('missing', { title: 'X', exercises: [] });
+    expect(useSequencesStore.getState().customSequences).toEqual(CUSTOM_SEEDS);
+  });
+
   it('removeCustomSequence removes only the targeted sequence', () => {
     useSequencesStore.getState().removeCustomSequence('c1');
     const ids = useSequencesStore.getState().customSequences.map((s) => s.id);

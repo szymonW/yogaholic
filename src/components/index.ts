@@ -5,3 +5,5 @@ export { ScreenHeader } from './ScreenHeader';
 export { ProgressBar } from './ProgressBar';
 export { RingTimer } from './RingTimer';
 export { SequenceCard } from './SequenceCard';
+export { Toggle } from './Toggle';
+export { ConfirmDialog } from './ConfirmDialog';

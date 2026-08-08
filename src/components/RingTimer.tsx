@@ -41,6 +41,7 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, children }: R
           backgroundColor: colors.ringInner,
           alignItems: 'center',
           justifyContent: 'center',
+          overflow: 'hidden',
         }}
       >
         {children}

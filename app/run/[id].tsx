@@ -1,6 +1,7 @@
+import { useAudioPlayer } from 'expo-audio';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconButton, ProgressBar, RingTimer } from '@/components';
 import { CloseIcon, PauseIcon, PlayIcon, SkipIcon } from '@/components/icons';
@@ -11,6 +12,8 @@ import { splitExerciseName } from '@/utils/exercise';
 import { goBack } from '@/utils/navigation';
 import { formatDuration } from '@/utils/time';
 
+const PREP_BEEP_SOUND = require('../../assets/sounds/Beep Short .mp3');
+
 export default function RunScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
@@ -20,12 +23,22 @@ export default function RunScreen() {
   const { phase, runIndex, paused, exercises, currentExercise, remainingSeconds, exerciseProgress, overallProgress, togglePause, skip } =
     useRunTimer(sequence);
 
+  const prepBeep = useAudioPlayer(PREP_BEEP_SOUND);
+
   useEffect(() => {
     if (phase !== 'complete' || !sequence) return;
     const durationSeconds = exercises.reduce((sum, exercise) => sum + exercise.duration, 0);
     logSession({ sequenceId: sequence.id, durationSeconds, exerciseCount: exercises.length });
     router.replace(`/complete/${sequence.id}`);
   }, [phase, sequence, exercises, logSession]);
+
+  // One beep per counted-down second, only during the "Przygotuj się" prep phase — never during
+  // the exercise itself.
+  useEffect(() => {
+    if (phase !== 'prep') return;
+    prepBeep.seekTo(0);
+    prepBeep.play();
+  }, [phase, remainingSeconds, prepBeep]);
 
   if (!sequence) {
     return (
@@ -56,7 +69,7 @@ export default function RunScreen() {
           <IconButton onPress={goBack} accessibilityLabel="Zamknij">
             <CloseIcon size={14} />
           </IconButton>
-          <Text style={styles.progressLabel}>
+          <Text style={styles.progressLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
             Ćwiczenie {runIndex + 1} z {exercises.length}
           </Text>
           <View style={styles.spacer} />
@@ -66,11 +79,23 @@ export default function RunScreen() {
 
       <View style={styles.center}>
         <RingTimer progress={isPrep ? 0 : exerciseProgress}>
-          <Text style={styles.illustration}>ilustracja: {primary.toLowerCase()}</Text>
+          {currentExercise.imageUri ? (
+            <Image source={currentExercise.imageUri} style={styles.illustrationImage} resizeMode="cover" />
+          ) : (
+            <Text style={styles.illustration}>ilustracja: {primary.toLowerCase()}</Text>
+          )}
         </RingTimer>
-        <Text style={styles.exerciseName}>{primary}</Text>
-        {original ? <Text style={styles.exerciseOriginal}>({original})</Text> : null}
-        <Text style={styles.phaseCaption}>{isPrep ? 'Przygotuj się' : 'Pozostały czas'}</Text>
+        <Text style={styles.exerciseName} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
+          {primary}
+        </Text>
+        {original ? (
+          <Text style={styles.exerciseOriginal} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
+            ({original})
+          </Text>
+        ) : null}
+        <Text style={styles.phaseCaption} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
+          {isPrep ? 'Przygotuj się' : 'Pozostały czas'}
+        </Text>
         <Text style={styles.timeBig}>{isPrep ? String(remainingSeconds) : formatDuration(remainingSeconds)}</Text>
       </View>
 
@@ -99,13 +124,20 @@ const styles = StyleSheet.create({
   topBarRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   spacer: { width: 36 },
   controlSpacer: { width: 52, height: 52 },
-  progressLabel: { fontSize: 14, color: colors.textSecondary },
+  // flexShrink gives adjustsFontSizeToFit a bounded box to shrink within — combined with
+  // numberOfLines=1, the whole "Ćwiczenie X z Y" stays on one line and fully visible (shrinking
+  // the font instead of wrapping/truncating) even under large accessibility font sizes.
+  progressLabel: { fontSize: 14, color: colors.textSecondary, flexShrink: 1, textAlign: 'center' },
   topProgress: { marginTop: spacing.lg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md - 2, paddingHorizontal: spacing.xl },
   illustration: { fontFamily: 'monospace', fontSize: 12, color: colors.textSecondary, textAlign: 'center', paddingHorizontal: spacing.lg },
-  exerciseName: { fontSize: 24, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginTop: spacing.xxs },
-  exerciseOriginal: { fontSize: 15, color: colors.textSecondary, textAlign: 'center' },
-  phaseCaption: { fontSize: 14, color: colors.textSecondary },
+  illustrationImage: { width: '100%', height: '100%' },
+  // exerciseName, exerciseOriginal and phaseCaption all use the same one-line-shrink-to-fit
+  // treatment as progressLabel above (numberOfLines=1 + adjustsFontSizeToFit) — none of these
+  // labels may ever wrap or get cut off mid-word, even under large accessibility font sizes.
+  exerciseName: { fontSize: 24, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginTop: spacing.xxs, width: '100%' },
+  exerciseOriginal: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', width: '100%' },
+  phaseCaption: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', width: '100%' },
   timeBig: { fontSize: 52, fontWeight: '700', color: colors.accent, fontVariant: ['tabular-nums'] },
   controls: {
     flexDirection: 'row',

@@ -8,11 +8,13 @@ interface SequenceCardProps {
   lastLabel?: string;
   onStart: () => void;
   onOpenDetail: () => void;
+  /** Custom sequences can be edited; built-in ones only get a read-only detail view. */
+  isEditable: boolean;
   /** Only shown (and the sequence deletable) when provided — custom sequences only. */
   onDelete?: () => void;
 }
 
-export function SequenceCard({ title, subtitle, lastLabel, onStart, onOpenDetail, onDelete }: SequenceCardProps) {
+export function SequenceCard({ title, subtitle, lastLabel, onStart, onOpenDetail, isEditable, onDelete }: SequenceCardProps) {
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{title}</Text>
@@ -23,7 +25,7 @@ export function SequenceCard({ title, subtitle, lastLabel, onStart, onOpenDetail
           <Text style={styles.startLabel}>Start</Text>
         </Pressable>
         <Pressable onPress={onOpenDetail} style={({ pressed }) => [styles.detailButton, pressed && styles.pressed]}>
-          <Text style={styles.detailLabel}>Edytuj</Text>
+          <Text style={styles.detailLabel}>{isEditable ? 'Edytuj' : 'Szczegóły'}</Text>
         </Pressable>
         {onDelete ? (
           <Pressable

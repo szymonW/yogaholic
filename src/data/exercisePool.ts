@@ -4,7 +4,7 @@ import type { Exercise } from '@/types';
 // ported 1:1 from the approved Claude Design mockup (const POOL).
 export const EXERCISE_POOL: Exercise[] = [
   { name: 'Pozycja góry (Tadasana)', duration: 30 },
-  { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45 },
+  { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45, imageUri: require('../../assets/exercises/dog.png') },
   { name: 'Wojownik I (Virabhadrasana I)', duration: 40 },
   { name: 'Wojownik II (Virabhadrasana II)', duration: 40 },
   { name: 'Trójkąt (Trikonasana)', duration: 40 },
@@ -15,4 +15,6 @@ export const EXERCISE_POOL: Exercise[] = [
   { name: 'Pozycja krzesła (Utkatasana)', duration: 35 },
   { name: 'Pozycja trupa (Savasana)', duration: 90 },
   { name: 'Skrętoskłon leżący (Supta Matsyendrasana)', duration: 45 },
+  { name: 'Przysiad jogina (Malasana)', duration: 40, imageUri: require('../../assets/exercises/Malasana.png') },
+  { name: 'Siad skrzyżny (Sukhasana)', duration: 60, imageUri: require('../../assets/exercises/siad_skrzyzny.png') },
 ];

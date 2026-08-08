@@ -38,6 +38,18 @@ Otworzy się Metro/Expo CLI z kodem QR. Dalej:
 
 Ten projekt jest na **Expo SDK 57**. Jeśli przy skanowaniu QR na telefonie pojawi się `Project is incompatible with this version of Expo Go`, apka Expo Go na telefonie ma starszą wersję SDK niż projekt (widać to w samej apce Expo Go, w profilu). Sklep Play zwykle nadgania szybko, ale jeśli nie — wejdź na `expo.dev/go` na telefonie, wybierz SDK 57 i zainstaluj stamtąd wskazaną wersję.
 
+## Budowanie samodzielnego APK (Android)
+
+Do zainstalowania na telefonie bez Expo Go potrzebny jest zbudowany plik `.apk`. Buduje go [EAS Build](https://docs.expo.dev/build/introduction/) w chmurze Expo (wymaga darmowego konta Expo — `npx eas-cli login`, jeśli jeszcze nie jesteś zalogowany/a):
+
+```bash
+npx eas-cli build --platform android --profile preview
+```
+
+Profil `preview` w `eas.json` ma ustawione `android.buildType: "apk"`, więc wynikiem jest gotowy do zainstalowania `.apk` (nie plik `.aab` pod Sklep Play). Po zakończeniu builda (kilka–kilkanaście minut, po stronie serwerów Expo) w terminalu i na [expo.dev](https://expo.dev) pojawi się link do pobrania — pobierz go na telefon i zainstaluj (Android poprosi o zgodę na instalację z nieznanego źródła, jeśli plik `.apk` nie pochodzi ze Sklepu Play).
+
+Profil `production` (bez `buildType`) buduje standardowe `.aab` pod publikację w Sklepie Play — do tego służy `npx eas-cli build --platform android --profile production`.
+
 ## Skrypty
 
 | Komenda | Co robi |

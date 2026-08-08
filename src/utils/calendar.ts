@@ -55,7 +55,7 @@ export function computeHourRange(events: DayEvent[], minStart = 6, maxEnd = 22):
   return { start, end };
 }
 
-export type MonthCellState = 'empty' | 'today' | 'done' | 'missed' | 'planned' | 'rest';
+export type MonthCellState = 'empty' | 'today' | 'todayDone' | 'done' | 'missed' | 'planned' | 'rest';
 
 export interface MonthCell {
   day: number | null;
@@ -81,7 +81,7 @@ export function getMonthCells(today: Date, doneDays: Set<number>, plannedDays: S
   for (let i = 0; i < startOffset; i++) cells.push({ day: null, state: 'empty' });
   for (let day = 1; day <= daysInMonth; day++) {
     let state: MonthCellState;
-    if (day === todayDay) state = 'today';
+    if (day === todayDay) state = doneDays.has(day) ? 'todayDone' : 'today';
     else if (day < todayDay) state = doneDays.has(day) ? 'done' : 'missed';
     else state = plannedDays.has(day) ? 'planned' : 'rest';
     cells.push({ day, state });

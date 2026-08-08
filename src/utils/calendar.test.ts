@@ -86,6 +86,13 @@ describe('getMonthCells', () => {
     expect(byDay.get(11)).toBe('rest');
   });
 
+  it('marks today as "todayDone" (not plain "today") once a session was logged today', () => {
+    const today = new Date(2026, 7, 5);
+    const cells = getMonthCells(today, new Set([5]), new Set());
+    const byDay = new Map(cells.filter((c) => c.day !== null).map((c) => [c.day, c.state]));
+    expect(byDay.get(5)).toBe('todayDone');
+  });
+
   it('has one cell per day of the month plus leading padding', () => {
     const cells = getMonthCells(new Date(2026, 7, 5), new Set(), new Set());
     const dayCells = cells.filter((c) => c.day !== null);

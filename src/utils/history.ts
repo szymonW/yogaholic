@@ -66,9 +66,13 @@ export function getLastPracticedDate(entries: HistoryEntry[], sequenceId: string
     .at(-1);
 }
 
-/** Short Polish "time ago" label for the recent-sequences list, e.g. "wczoraj", "3 dni temu". */
+/**
+ * Short Polish "time ago" label for the recent-sequences list, e.g. "wczoraj", "3 dni temu".
+ * Diffs calendar dates (both sides normalized to local midnight), not raw elapsed milliseconds —
+ * otherwise a session logged this afternoon reads as "1 day ago" once >12h has passed since midnight.
+ */
 export function formatRelativeDays(dateISO: string, today: Date): string {
-  const days = Math.round((today.getTime() - parseISODate(dateISO).getTime()) / 86_400_000);
+  const days = Math.round((parseISODate(toISODate(today)).getTime() - parseISODate(dateISO).getTime()) / 86_400_000);
   if (days <= 0) return 'dzisiaj';
   if (days === 1) return 'wczoraj';
   if (days < 7) return `${days} dni temu`;

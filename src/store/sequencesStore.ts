@@ -11,6 +11,7 @@ interface SequencesState {
   recentIds: string[];
   getById: (id: string) => Sequence | undefined;
   addCustomSequence: (input: { title: string; exercises: Exercise[] }) => Sequence;
+  updateCustomSequence: (id: string, input: { title: string; exercises: Exercise[] }) => void;
   removeCustomSequence: (id: string) => void;
   pushRecent: (id: string) => void;
 }
@@ -27,6 +28,12 @@ export const useSequencesStore = create<SequencesState>()(
         const sequence: Sequence = { id: `c${Date.now()}`, title, exercises };
         set((state) => ({ customSequences: [...state.customSequences, sequence] }));
         return sequence;
+      },
+
+      updateCustomSequence: (id, { title, exercises }) => {
+        set((state) => ({
+          customSequences: state.customSequences.map((sequence) => (sequence.id === id ? { ...sequence, title, exercises } : sequence)),
+        }));
       },
 
       removeCustomSequence: (id) => {

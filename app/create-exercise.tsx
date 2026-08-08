@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components';
 import { useExercisePoolStore } from '@/store';
@@ -13,7 +13,7 @@ export default function CreateExerciseModal() {
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [duration, setDuration] = useState('');
-  const [imageUri, setImageUri] = useState<string | undefined>();
+  const [imageUri, setImageUri] = useState<ImageSourcePropType | undefined>();
   const addExercise = useExercisePoolStore((state) => state.addExercise);
 
   const durationNumber = parseInt(duration, 10);
@@ -23,7 +23,7 @@ export default function CreateExerciseModal() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) return;
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
-    if (!result.canceled && result.assets[0]) setImageUri(result.assets[0].uri);
+    if (!result.canceled && result.assets[0]) setImageUri({ uri: result.assets[0].uri });
   };
 
   const handleSave = () => {
@@ -40,7 +40,7 @@ export default function CreateExerciseModal() {
         <Text style={styles.label}>Obrazek</Text>
         <Pressable onPress={pickImage} style={styles.imageBox}>
           {imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.imagePreview} resizeMode="cover" />
+            <Image source={imageUri} style={styles.imagePreview} resizeMode="cover" />
           ) : (
             <Text style={styles.imagePlaceholder}>Kliknij aby dodać obrazek</Text>
           )}
@@ -63,7 +63,7 @@ export default function CreateExerciseModal() {
         <TextInput
           value={duration}
           onChangeText={setDuration}
-          placeholder="60"
+          placeholder="np. 60"
           placeholderTextColor={colors.textTertiary}
           keyboardType="number-pad"
           style={[styles.input, styles.inputCentered]}

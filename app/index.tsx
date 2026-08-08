@@ -54,7 +54,7 @@ export default function Home() {
     },
     {
       key: 'saved',
-      title: 'Zapisane sekwencje',
+      title: 'Polecane sekwencje',
       subtitle: `${SAVED_COUNT} sekwencji`,
       Icon: BookmarkIcon,
       onPress: () => openCategory('saved'),

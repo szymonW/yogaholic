@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ScreenHeader } from '@/components';
+import { ScreenHeader, Toggle } from '@/components';
 import { useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { goBack } from '@/utils/navigation';
@@ -9,17 +9,26 @@ const PREP_PRESETS_SECONDS = [3, 5, 10];
 
 interface SettingsRowProps {
   label: string;
-  value: string;
+  /** Plain text value (e.g. a duration or version string). Ignored when `toggleValue` is set. */
+  value?: string;
+  /** When provided, renders a Toggle instead of the text value. */
+  toggleValue?: boolean;
   onPress?: () => void;
   isLast?: boolean;
 }
 
-function SettingsRow({ label, value, onPress, isLast }: SettingsRowProps) {
+function SettingsRow({ label, value, toggleValue, onPress, isLast }: SettingsRowProps) {
   const Wrapper = onPress ? Pressable : View;
+  const isToggle = toggleValue !== undefined;
   return (
-    <Wrapper onPress={onPress} style={[styles.row, !isLast && styles.rowBorder]}>
+    <Wrapper
+      onPress={onPress}
+      style={[styles.row, !isLast && styles.rowBorder]}
+      accessibilityRole={isToggle ? 'switch' : onPress ? 'button' : undefined}
+      accessibilityState={isToggle ? { checked: toggleValue } : undefined}
+    >
       <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
+      {isToggle ? <Toggle value={toggleValue} /> : <Text style={styles.rowValue}>{value}</Text>}
     </Wrapper>
   );
 }
@@ -39,8 +48,8 @@ export default function SettingsScreen() {
       <ScreenHeader title="Ustawienia" onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
-          <SettingsRow label="Powiadomienia" value={notificationsEnabled ? 'Wł.' : 'Wył.'} onPress={toggleNotifications} />
-          <SettingsRow label="Głos instruktora" value={instructorVoiceEnabled ? 'Wł.' : 'Wył.'} onPress={toggleInstructorVoice} />
+          <SettingsRow label="Powiadomienia" toggleValue={notificationsEnabled} onPress={toggleNotifications} />
+          <SettingsRow label="Głos instruktora" toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
           <SettingsRow label="Odliczanie przygotowania" value={`${prepCountdownSeconds} s`} onPress={cyclePrepCountdown} isLast />
         </View>
 

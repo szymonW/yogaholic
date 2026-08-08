@@ -21,9 +21,15 @@ const GUTTER_WIDTH = 26;
 // left empty rather than inventing sessions the user never actually planned.
 const PLANNED_DAYS = new Set<number>();
 
-const MONTH_CELL_STYLES: Record<MonthCellState, { backgroundColor: string; borderColor?: string; borderStyle?: 'dashed'; textColor: string }> = {
+const MONTH_CELL_STYLES: Record<
+  MonthCellState,
+  { backgroundColor: string; borderColor?: string; borderStyle?: 'dashed' | 'solid'; textColor: string }
+> = {
   empty: { backgroundColor: 'transparent', textColor: 'transparent' },
   today: { backgroundColor: colors.accent, textColor: colors.accentOn },
+  // Same fill as "done" (so a completed day always reads as done, even today), plus an accent
+  // ring so today stays visually distinguishable from any other done day in the month.
+  todayDone: { backgroundColor: colors.calendarDoneBg + '48', borderColor: colors.accent, borderStyle: 'solid', textColor: colors.textPrimary },
   done: { backgroundColor: colors.calendarDoneBg + '48', textColor: colors.textPrimary },
   missed: { backgroundColor: 'transparent', textColor: colors.textFaint },
   planned: { backgroundColor: 'transparent', borderColor: colors.accentDashed, borderStyle: 'dashed', textColor: colors.textPrimary },
@@ -122,10 +128,7 @@ export default function CalendarScreen() {
               <View style={[styles.legendDot, { backgroundColor: colors.calendarDoneBg + '48' }]} />
               <Text style={styles.legendLabel}>Wykonane</Text>
             </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.accentDashed }]} />
-              <Text style={styles.legendLabel}>Zaplanowane</Text>
-            </View>
+            {/* "Zaplanowane" is left out until a real scheduling feature exists — see PLANNED_DAYS above. */}
           </View>
         </View>
       </ScrollView>
