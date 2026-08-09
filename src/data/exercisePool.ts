@@ -6,14 +6,8 @@ export const EXERCISE_POOL: Exercise[] = [
   { name: 'Pozycja góry (Tadasana)', duration: 30, imageUri: require('../../assets/exercises/Mountain Pose (Tadasana).png') },
   { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45, imageUri: require('../../assets/exercises/dog.png') },
   { name: 'Wojownik I (Virabhadrasana I)', duration: 40, imageUri: require('../../assets/exercises/Warrior I (Virabhadrasana I).png') },
-  { name: 'Wojownik II (Virabhadrasana II)', duration: 40 },
-  { name: 'Trójkąt (Trikonasana)', duration: 40 },
-  { name: 'Deska (Phalakasana)', duration: 30 },
-  { name: 'Kobra (Bhujangasana)', duration: 30 },
   { name: 'Dziecko (Balasana)', duration: 60, imageUri: require("../../assets/exercises/Child's Pose (Balasana).png") },
-  { name: 'Drzewo (Vrksasana)', duration: 30 },
-  { name: 'Pozycja krzesła (Utkatasana)', duration: 35 },
-  { name: 'Pozycja trupa (Savasana)', duration: 90 },
+  { name: 'Drzewo (Vrksasana)', duration: 30, imageUri: require('../../assets/exercises/Tree Pose (Vrksasana).png') },
   {
     name: 'Skrętoskłon leżący (Supta Matsyendrasana)',
     duration: 45,
@@ -25,5 +19,16 @@ export const EXERCISE_POOL: Exercise[] = [
     name: 'Pozycja kota i krowy (Marjaryasana-Bitilasana)',
     duration: 40,
     imageUri: require('../../assets/exercises/Cat-Cow (Marjaryasana–Bitilasana).png'),
+  },
+  {
+    name: 'Pies z głową w górę (Urdhva Mukha Svanasana)',
+    duration: 40,
+    imageUri: require('../../assets/exercises/Pies z głową w górę (Urdhva Mukha Svanasana).png'),
+  },
+  { name: 'Skłon w przód (Uttanasana)', duration: 35, imageUri: require('../../assets/exercises/Skłon w przód (Uttanasana).png') },
+  {
+    name: 'Szczęśliwe dziecko (Ananda Balasana)',
+    duration: 45,
+    imageUri: require('../../assets/exercises/Szczęśliwe dziecko (Ananda Balasana).png'),
   },
 ];
