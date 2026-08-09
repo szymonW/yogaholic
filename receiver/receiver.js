@@ -9,9 +9,14 @@
   // with no bundled image, or user-picked photos that only exist on the phone) fall back to the
   // text placeholder below.
   var IMAGE_SLUGS = {
+    tadasana: 'assets/tadasana.png',
     dog: 'assets/dog.png',
+    'warrior-1': 'assets/warrior-1.png',
+    balasana: 'assets/balasana.png',
+    'supta-matsyendrasana': 'assets/supta-matsyendrasana.png',
     malasana: 'assets/malasana.png',
     'siad-skrzyzny': 'assets/siad-skrzyzny.png',
+    'cat-cow': 'assets/cat-cow.png',
   };
 
   var els = {

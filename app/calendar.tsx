@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ScreenHeader } from '@/components';
+import { ScreenBackground, ScreenHeader } from '@/components';
 import { useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import {
@@ -50,7 +50,7 @@ export default function CalendarScreen() {
   const monthCells = getMonthCells(today, doneDays, PLANNED_DAYS);
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <ScreenHeader title="Kalendarz" onBack={goBack} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
@@ -132,12 +132,12 @@ export default function CalendarScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   content: {
     padding: spacing.xl,
     paddingTop: spacing.md,

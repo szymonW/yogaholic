@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ProgressBar, ScreenHeader } from '@/components';
+import { ProgressBar, ScreenBackground, ScreenHeader } from '@/components';
 import { useGoalsStore, useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { computeStreak, summarizeWeek } from '@/utils/history';
@@ -14,7 +14,7 @@ export default function GoalsScreen() {
   const streak = computeStreak(entries, today);
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <ScreenHeader title="Cele" onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
@@ -60,12 +60,12 @@ export default function GoalsScreen() {
           <Text style={styles.streakValue}>{streak} dni</Text>
         </View>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   content: {
     padding: spacing.xl,
     paddingTop: spacing.md,

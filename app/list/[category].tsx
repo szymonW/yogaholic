@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Button, ConfirmDialog, ScreenHeader, SequenceCard } from '@/components';
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import { Button, ConfirmDialog, ScreenBackground, ScreenHeader, SequenceCard } from '@/components';
 import { selectSequencesForCategory, useHistoryStore, useSequencesStore } from '@/store';
 import { colors, spacing } from '@/theme';
 import type { SequenceCategory } from '@/types';
@@ -11,10 +11,7 @@ import { totalDuration } from '@/utils/time';
 
 const CATEGORY_LABELS: Record<SequenceCategory, string> = {
   recent: 'Ostatnio ćwiczone',
-  // Curated app content (BASE_SEQUENCES tagged "saved"), not a user bookmark list — there is
-  // no save/bookmark action anywhere in the UI, so "Zapisane" would promise a feature that
-  // doesn't exist.
-  saved: 'Polecane sekwencje',
+  saved: 'Ulubione',
   sample: 'Przykładowe sekwencje',
   custom: 'Własne sekwencje',
 };
@@ -36,7 +33,7 @@ export default function ListScreen() {
   const today = new Date();
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <ScreenHeader title={label} onBack={goBack} />
       <ScrollView contentContainerStyle={styles.content}>
         {isCustom ? (
@@ -82,12 +79,12 @@ export default function ListScreen() {
         }}
         onCancel={() => setPendingDelete(null)}
       />
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   content: {
     padding: spacing.xl,
     paddingTop: spacing.md,
