@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import type { ReactElement } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { IconButton } from '@/components';
+import { IconButton, ScreenBackground } from '@/components';
 import {
   BookmarkIcon,
   CalendarIcon,
@@ -54,7 +54,7 @@ export default function Home() {
     },
     {
       key: 'saved',
-      title: 'Polecane sekwencje',
+      title: 'Ulubione',
       subtitle: `${SAVED_COUNT} sekwencji`,
       Icon: BookmarkIcon,
       onPress: () => openCategory('saved'),
@@ -90,12 +90,9 @@ export default function Home() {
   ];
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-        <View>
-          <Text style={[typography.display, styles.title]}>Yogaholic</Text>
-          <Text style={styles.subtitle}>Wybierz sekwencję do ćwiczenia</Text>
-        </View>
+        <Text style={[typography.display, styles.title]}>Yogaholic</Text>
         <IconButton onPress={() => router.push('/settings')} accessibilityLabel="Ustawienia" style={styles.settingsButton}>
           <SettingsIcon />
         </IconButton>
@@ -108,22 +105,25 @@ export default function Home() {
               <View style={styles.tileIconWrap}>
                 <Icon />
               </View>
-              <View>
-                <Text style={styles.tileTitle}>{title}</Text>
-                <Text style={styles.tileSubtitle}>{subtitle}</Text>
+              <View style={styles.tileTextWrap}>
+                <Text style={styles.tileTitle} numberOfLines={2}>
+                  {title}
+                </Text>
+                <Text style={styles.tileSubtitle} numberOfLines={1}>
+                  {subtitle}
+                </Text>
               </View>
             </Pressable>
           ))}
         </View>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -136,18 +136,15 @@ const styles = StyleSheet.create({
   title: {
     color: colors.textPrimary,
   },
-  subtitle: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    marginTop: spacing.xxs,
-  },
   settingsButton: {
     marginTop: spacing.xxs,
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: spacing.xl,
+    justifyContent: 'flex-end',
+    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xxxl,
   },
   grid: {
     flexDirection: 'row',
@@ -156,32 +153,42 @@ const styles = StyleSheet.create({
   },
   tile: {
     width: '47%',
-    aspectRatio: 1,
+    minHeight: 87,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.xxl,
-    padding: spacing.xl,
-    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
   tilePressed: {
     opacity: 0.8,
   },
   tileIconWrap: {
-    width: 44,
-    height: 44,
+    width: 34,
+    height: 34,
     borderRadius: radius.md,
     backgroundColor: colors.background,
+    opacity: 0.5,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
+  },
+  tileTextWrap: {
+    flex: 1,
+    minWidth: 0,
   },
   tileTitle: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.textPrimary,
+    lineHeight: 18,
   },
   tileSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textTertiary,
     marginTop: 2,
   },

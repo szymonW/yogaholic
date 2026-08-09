@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CastButtonSafe } from '@/cast/CastButtonSafe';
 import { EXERCISE_IMAGE_SLUGS } from '@/cast/imageSlugs';
 import { buildCastRunPayload, CAST_COMPLETE_MESSAGE } from '@/cast/payload';
-import { IconButton, ProgressBar, RingTimer } from '@/components';
+import { IconButton, ProgressBar, RingTimer, ScreenBackground } from '@/components';
 import { CloseIcon, PauseIcon, PlayIcon, PreviousIcon, SkipIcon } from '@/components/icons';
 import { useCastRunChannel } from '@/hooks/useCastRunChannel';
 import { useRunTimer } from '@/hooks/useRunTimer';
@@ -78,7 +78,7 @@ export default function RunScreen() {
 
   if (!sequence) {
     return (
-      <View style={styles.root}>
+      <ScreenBackground style={styles.root}>
         <View style={[styles.topBar, { paddingTop: insets.top }]}>
           <IconButton onPress={goBack} accessibilityLabel="Zamknij">
             <CloseIcon />
@@ -87,19 +87,19 @@ export default function RunScreen() {
         <View style={styles.center}>
           <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
         </View>
-      </View>
+      </ScreenBackground>
     );
   }
 
   if (phase === 'idle' || phase === 'complete' || !currentExercise) {
-    return <View style={styles.root} />;
+    return <ScreenBackground style={styles.root} />;
   }
 
   const { primary, original } = splitExerciseName(currentExercise.name);
   const isPrep = phase === 'prep';
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <View style={[styles.topBar, { paddingTop: insets.top }]}>
         <View style={styles.topBarRow}>
           <IconButton onPress={goBack} accessibilityLabel="Zamknij">
@@ -162,12 +162,12 @@ export default function RunScreen() {
           <SkipIcon />
         </IconButton>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   topBar: { paddingHorizontal: spacing.xl },
   topBarRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   castButton: { width: 36, height: 36 },

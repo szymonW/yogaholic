@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Button, ScreenHeader } from '@/components';
+import { Button, ScreenBackground, ScreenHeader } from '@/components';
 import { selectAllExercises, useExercisePoolStore, useSequencesStore } from '@/store';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Exercise } from '@/types';
@@ -49,17 +49,17 @@ export default function CreateSequenceScreen() {
 
   if (isEditing && !existingSequence) {
     return (
-      <View style={styles.root}>
+      <ScreenBackground style={styles.root}>
         <ScreenHeader title="Edytuj sekwencję" size="h2" onBack={goBack} />
         <View style={styles.notFound}>
           <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
         </View>
-      </View>
+      </ScreenBackground>
     );
   }
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <ScreenHeader title={isEditing ? 'Edytuj sekwencję' : 'Nowa sekwencja'} size="h2" onBack={goBack} />
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -123,12 +123,12 @@ export default function CreateSequenceScreen() {
       <View style={styles.footer}>
         <Button title={isEditing ? 'Zapisz zmiany' : 'Zapisz sekwencję'} size="lg" disabled={!canSave} onPress={handleSave} />
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   content: {
     padding: spacing.xl,

@@ -31,6 +31,7 @@
     "@types/react": "~19.2.2",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.1",
+    "patch-package": "^8.0.1",
     "test-renderer": "^1.2.0",
     "typescript": "~6.0.3"
   },
@@ -41,7 +42,8 @@
     "web": "expo start --web",
     "test": "jest",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "patch-package"
   },
   "private": true
 }

@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ScreenHeader, Toggle } from '@/components';
+import { ScreenBackground, ScreenHeader, Toggle } from '@/components';
 import { useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { goBack } from '@/utils/navigation';
@@ -44,7 +44,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <ScreenHeader title="Ustawienia" onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
@@ -57,12 +57,12 @@ export default function SettingsScreen() {
           <SettingsRow label="O aplikacji" value={Constants.expoConfig?.version ?? '1.0'} isLast />
         </View>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   content: {
     padding: spacing.xl,
     paddingTop: spacing.md,

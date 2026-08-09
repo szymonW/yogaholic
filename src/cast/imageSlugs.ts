@@ -6,7 +6,12 @@
  * map and the files under receiver/assets/.
  */
 export const EXERCISE_IMAGE_SLUGS: Record<string, string> = {
+  'Pozycja góry (Tadasana)': 'tadasana',
   'Pies z głową w dół (Adho Mukha Svanasana)': 'dog',
+  'Wojownik I (Virabhadrasana I)': 'warrior-1',
+  'Dziecko (Balasana)': 'balasana',
+  'Skrętoskłon leżący (Supta Matsyendrasana)': 'supta-matsyendrasana',
   'Przysiad jogina (Malasana)': 'malasana',
   'Siad skrzyżny (Sukhasana)': 'siad-skrzyzny',
+  'Pozycja kota i krowy (Marjaryasana-Bitilasana)': 'cat-cow',
 };

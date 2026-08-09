@@ -1,6 +1,7 @@
 export { Button } from './Button';
 export { IconButton } from './IconButton';
 export { Card } from './Card';
+export { ScreenBackground } from './ScreenBackground';
 export { ScreenHeader } from './ScreenHeader';
 export { ProgressBar } from './ProgressBar';
 export { RingTimer } from './RingTimer';

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { colors } from '@/theme';
@@ -20,7 +20,7 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, blinkKey, chi
   const center = size / 2;
   const innerSize = size - strokeWidth * 2;
 
-  const ringOpacity = useRef(new Animated.Value(1)).current;
+  const [ringOpacity] = useState(() => new Animated.Value(1));
   const isFirstBlink = useRef(true);
 
   // Ticks arrive once per second, but interpolating toward each new value over that same
@@ -31,7 +31,7 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, blinkKey, chi
   // Driven via setNativeProps (rather than Animated.createAnimatedComponent) because
   // react-native-web's Animated HOC injects a `collapsable` prop meant for Views, which
   // react-native-svg's web Circle forwards straight to the DOM as an invalid SVG attribute.
-  const progressAnim = useRef(new Animated.Value(clamped)).current;
+  const [progressAnim] = useState(() => new Animated.Value(clamped));
   const prevProgress = useRef(clamped);
   const progressCircleRef = useRef<Circle>(null);
 
@@ -57,7 +57,7 @@ export function RingTimer({ progress, size = 264, strokeWidth = 7, blinkKey, chi
     }).start();
   }, [clamped, progressAnim]);
 
-  const initialStrokeDashoffset = useRef(circumference * (1 - clamped)).current;
+  const [initialStrokeDashoffset] = useState(() => circumference * (1 - clamped));
 
   useEffect(() => {
     if (blinkKey === undefined) return;

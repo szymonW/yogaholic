@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
-import { Button } from '@/components';
+import { Button, ScreenBackground } from '@/components';
 import { CheckIcon } from '@/components/icons';
 import { useRunStore } from '@/store/runStore';
 import { useSequencesStore } from '@/store/sequencesStore';
@@ -17,9 +17,9 @@ export default function CompleteScreen() {
 
   if (!sequence) {
     return (
-      <View style={styles.root}>
+      <ScreenBackground style={styles.root}>
         <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
-      </View>
+      </ScreenBackground>
     );
   }
 
@@ -35,7 +35,7 @@ export default function CompleteScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <View style={styles.badge}>
         <CheckIcon />
       </View>
@@ -57,14 +57,13 @@ export default function CompleteScreen() {
         <Button title="Powtórz sekwencję" size="lg" onPress={handleRestart} />
         <Button title="Wróć do listy" variant="secondary" size="lg" onPress={handleBackToList} />
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.lg + 2,

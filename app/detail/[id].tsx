@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Button, IconButton } from '@/components';
+import { Button, IconButton, ScreenBackground } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
 import { useSequencesStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
@@ -15,7 +15,7 @@ export default function DetailScreen() {
 
   if (!sequence) {
     return (
-      <View style={styles.root}>
+      <ScreenBackground style={styles.root}>
         <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
           <IconButton onPress={goBack} accessibilityLabel="Wstecz">
             <ChevronLeftIcon />
@@ -24,12 +24,12 @@ export default function DetailScreen() {
         <View style={styles.content}>
           <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
         </View>
-      </View>
+      </ScreenBackground>
     );
   }
 
   return (
-    <View style={styles.root}>
+    <ScreenBackground style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
         <IconButton onPress={goBack} accessibilityLabel="Wstecz">
           <ChevronLeftIcon />
@@ -52,12 +52,12 @@ export default function DetailScreen() {
       <View style={styles.footer}>
         <Button title="Rozpocznij sekwencję" size="lg" onPress={() => router.push(`/run/${sequence.id}`)} />
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1 },
   header: {
     gap: spacing.md - 2,
     paddingHorizontal: spacing.xl,

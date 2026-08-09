@@ -1,0 +1,30 @@
+diff --git a/node_modules/react-native-google-cast/src/api/useCastChannel.ts b/node_modules/react-native-google-cast/src/api/useCastChannel.ts
+index 4fdc619..a96a1db 100644
+--- a/node_modules/react-native-google-cast/src/api/useCastChannel.ts
++++ b/node_modules/react-native-google-cast/src/api/useCastChannel.ts
+@@ -39,17 +39,20 @@ export default function useCastChannel(
+     let channel: CastChannel | null
+ 
+     if (castSession) {
+-      castSession.addChannel(namespace).then((c) => {
+-        channel = c
+-        setCastChannel(c)
+-      })
++      castSession
++        .addChannel(namespace)
++        .then((c) => {
++          channel = c
++          setCastChannel(c)
++        })
++        .catch(() => {})
+     } else {
+       channel = null
+       setCastChannel(null)
+     }
+ 
+     return () => {
+-      channel?.remove()
++      channel?.remove().catch(() => {})
+     }
+   }, [castSession, namespace])
+ 

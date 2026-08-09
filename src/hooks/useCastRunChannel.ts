@@ -33,7 +33,10 @@ function useCastRunChannelNative() {
   const sendRunState = useCallback(
     (message: CastMessage) => {
       if (!isCasting || !channel) return;
-      channel.sendMessage(message);
+      // Best-effort mirror to the TV: if the session ends between the isCasting check and the
+      // native call actually running, sendMessage rejects with "No session" — not actionable,
+      // so swallow it instead of surfacing an unhandled promise rejection.
+      channel.sendMessage(message).catch(() => {});
     },
     [isCasting, channel]
   );
