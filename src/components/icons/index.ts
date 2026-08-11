@@ -13,4 +13,5 @@ export { PauseIcon } from './PauseIcon';
 export { SkipIcon } from './SkipIcon';
 export { PreviousIcon } from './PreviousIcon';
 export { CheckIcon } from './CheckIcon';
+export { DragHandleIcon } from './DragHandleIcon';
 export type { IconProps } from './types';

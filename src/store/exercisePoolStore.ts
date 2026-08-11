@@ -7,6 +7,8 @@ import { storage } from './storage';
 interface ExercisePoolState {
   customExercises: Exercise[];
   addExercise: (exercise: Exercise) => void;
+  updateExerciseDuration: (index: number, duration: number) => void;
+  removeExercise: (index: number) => void;
 }
 
 export const useExercisePoolStore = create<ExercisePoolState>()(
@@ -14,6 +16,12 @@ export const useExercisePoolStore = create<ExercisePoolState>()(
     (set) => ({
       customExercises: [],
       addExercise: (exercise) => set((state) => ({ customExercises: [...state.customExercises, exercise] })),
+      updateExerciseDuration: (index, duration) =>
+        set((state) => ({
+          customExercises: state.customExercises.map((exercise, i) => (i === index ? { ...exercise, duration } : exercise)),
+        })),
+      removeExercise: (index) =>
+        set((state) => ({ customExercises: state.customExercises.filter((_, i) => i !== index) })),
     }),
     { name: 'yogaholic/exercise-pool', storage }
   )

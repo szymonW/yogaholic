@@ -1,7 +1,8 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Button, ScreenBackground, ScreenHeader } from '@/components';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, ScreenBackground, ScreenHeader, StepButton } from '@/components';
+import { DragHandleIcon } from '@/components/icons';
 import { selectAllExercises, useExercisePoolStore, useSequencesStore } from '@/store';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Exercise } from '@/types';
@@ -10,6 +11,69 @@ import { formatDuration } from '@/utils/time';
 
 const DURATION_STEP = 5;
 const DURATION_MIN = 10;
+const ROW_HEIGHT_FALLBACK = 60;
+
+interface EditableItem {
+  id: string;
+  exercise: Exercise;
+}
+
+interface SequenceItemRowProps {
+  editableItem: EditableItem;
+  isDragging: boolean;
+  dragY: Animated.Value;
+  onChangeDuration: (id: string, delta: number) => void;
+  onRemove: (id: string) => void;
+  onDragStart: (id: string) => void;
+  onDragMove: (id: string, dy: number) => void;
+  onDragEnd: () => void;
+  onMeasureHeight: (height: number) => void;
+}
+
+function SequenceItemRow({
+  editableItem,
+  isDragging,
+  dragY,
+  onChangeDuration,
+  onRemove,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
+  onMeasureHeight,
+}: SequenceItemRowProps) {
+  const { id, exercise } = editableItem;
+
+  // Created once per row instance (stable key = id) so an in-progress gesture
+  // survives the row being reordered to a new index mid-drag.
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dy) > 2,
+      onPanResponderGrant: () => onDragStart(id),
+      onPanResponderMove: (_, gestureState) => onDragMove(id, gestureState.dy),
+      onPanResponderRelease: onDragEnd,
+      onPanResponderTerminate: onDragEnd,
+    })
+  ).current;
+
+  return (
+    <Animated.View
+      style={[styles.itemRow, isDragging && styles.itemRowDragging, isDragging && { transform: [{ translateY: dragY }] }]}
+      onLayout={(e) => onMeasureHeight(e.nativeEvent.layout.height)}
+    >
+      <View {...panResponder.panHandlers} style={styles.dragHandle} accessibilityLabel={`Przesuń ${exercise.name}`}>
+        <DragHandleIcon />
+      </View>
+      <Text style={styles.itemName}>{exercise.name}</Text>
+      <StepButton label="−" onStep={() => onChangeDuration(id, -DURATION_STEP)} />
+      <Text style={styles.itemTime}>{formatDuration(exercise.duration)}</Text>
+      <StepButton label="+" onStep={() => onChangeDuration(id, DURATION_STEP)} />
+      <Pressable onPress={() => onRemove(id)} accessibilityLabel={`Usuń ${exercise.name}`} style={styles.removeButton}>
+        <Text style={styles.removeLabel}>×</Text>
+      </Pressable>
+    </Animated.View>
+  );
+}
 
 export default function CreateSequenceScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -21,28 +85,96 @@ export default function CreateSequenceScreen() {
   const existingSequence = useSequencesStore((state) => (id ? state.getById(id) : undefined));
   const pool = selectAllExercises({ customExercises });
 
+  const idCounter = useRef(0);
+  const makeId = () => `item-${Date.now()}-${idCounter.current++}`;
+
   const [name, setName] = useState(existingSequence?.title ?? '');
-  const [items, setItems] = useState<Exercise[]>(existingSequence?.exercises ?? []);
+  const [items, setItems] = useState<EditableItem[]>(() => (existingSequence?.exercises ?? []).map((exercise) => ({ id: makeId(), exercise })));
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const dragY = useRef(new Animated.Value(0)).current;
+  const rowHeightRef = useRef(ROW_HEIGHT_FALLBACK);
+  const startIndexRef = useRef(0);
+  const currentIndexRef = useRef(0);
+  const totalRef = useRef(0);
+  const draggingIdRef = useRef<string | null>(null);
+
   const canSave = name.trim().length > 0 && items.length > 0;
-  const addedCounts = items.reduce<Record<string, number>>((counts, item) => {
-    counts[item.name] = (counts[item.name] ?? 0) + 1;
+  const addedCounts = items.reduce<Record<string, number>>((counts, it) => {
+    counts[it.exercise.name] = (counts[it.exercise.name] ?? 0) + 1;
     return counts;
   }, {});
 
   const addFromPool = (exercise: Exercise) =>
-    setItems((prev) => [...prev, { name: exercise.name, duration: exercise.duration, imageUri: exercise.imageUri }]);
-  const changeDuration = (index: number, delta: number) =>
-    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, duration: Math.max(DURATION_MIN, item.duration + delta) } : item)));
-  const removeItem = (index: number) => setItems((prev) => prev.filter((_, i) => i !== index));
+    setItems((prev) => [...prev, { id: makeId(), exercise: { name: exercise.name, duration: exercise.duration, imageUri: exercise.imageUri } }]);
+
+  const changeDuration = useCallback(
+    (itemId: string, delta: number) =>
+      setItems((prev) =>
+        prev.map((it) =>
+          it.id === itemId ? { ...it, exercise: { ...it.exercise, duration: Math.max(DURATION_MIN, it.exercise.duration + delta) } } : it
+        )
+      ),
+    []
+  );
+  const removeItem = useCallback((itemId: string) => setItems((prev) => prev.filter((it) => it.id !== itemId)), []);
+
+  const handleMeasureHeight = useCallback((height: number) => {
+    if (height > 0) rowHeightRef.current = height + spacing.sm;
+  }, []);
+
+  const handleDragStart = useCallback((itemId: string) => {
+    const index = itemsRef.current.findIndex((it) => it.id === itemId);
+    if (index === -1) return;
+    startIndexRef.current = index;
+    currentIndexRef.current = index;
+    totalRef.current = itemsRef.current.length;
+    draggingIdRef.current = itemId;
+    dragY.setValue(0);
+    setDraggingId(itemId);
+  }, [dragY]);
+
+  const handleDragMove = useCallback(
+    (itemId: string, dy: number) => {
+      if (draggingIdRef.current !== itemId) return;
+      const step = rowHeightRef.current;
+      const rawIndex = startIndexRef.current + dy / step;
+      const newIndex = Math.min(Math.max(Math.round(rawIndex), 0), totalRef.current - 1);
+      dragY.setValue(dy - (newIndex - startIndexRef.current) * step);
+
+      if (newIndex !== currentIndexRef.current) {
+        const from = currentIndexRef.current;
+        currentIndexRef.current = newIndex;
+        setItems((prev) => {
+          const next = [...prev];
+          const [moved] = next.splice(from, 1);
+          next.splice(newIndex, 0, moved);
+          return next;
+        });
+      }
+    },
+    [dragY]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    draggingIdRef.current = null;
+    Animated.timing(dragY, { toValue: 0, duration: 150, useNativeDriver: true }).start();
+    setDraggingId(null);
+  }, [dragY]);
 
   const handleSave = () => {
     if (!canSave) return;
+    const exercises = items.map((it) => it.exercise);
     if (isEditing && id) {
-      updateCustomSequence(id, { title: name.trim(), exercises: items });
+      updateCustomSequence(id, { title: name.trim(), exercises });
     } else {
-      addCustomSequence({ title: name.trim(), exercises: items });
+      addCustomSequence({ title: name.trim(), exercises });
     }
     goBack();
   };
@@ -62,7 +194,7 @@ export default function CreateSequenceScreen() {
     <ScreenBackground style={styles.root}>
       <ScreenHeader title={isEditing ? 'Edytuj sekwencję' : 'Nowa sekwencja'} size="h2" onBack={goBack} />
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} scrollEnabled={draggingId === null}>
         <View style={styles.field}>
           <Text style={styles.label}>Nazwa sekwencji</Text>
           <TextInput
@@ -77,20 +209,19 @@ export default function CreateSequenceScreen() {
         <View style={styles.field}>
           <Text style={styles.label}>Pozycje ({items.length})</Text>
 
-          {items.map((item, index) => (
-            <View key={`${item.name}-${index}`} style={styles.itemRow}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Pressable onPress={() => changeDuration(index, -DURATION_STEP)} style={styles.stepButton}>
-                <Text style={styles.stepLabel}>−</Text>
-              </Pressable>
-              <Text style={styles.itemTime}>{formatDuration(item.duration)}</Text>
-              <Pressable onPress={() => changeDuration(index, DURATION_STEP)} style={styles.stepButton}>
-                <Text style={styles.stepLabel}>+</Text>
-              </Pressable>
-              <Pressable onPress={() => removeItem(index)} accessibilityLabel={`Usuń ${item.name}`} style={styles.removeButton}>
-                <Text style={styles.removeLabel}>×</Text>
-              </Pressable>
-            </View>
+          {items.map((it) => (
+            <SequenceItemRow
+              key={it.id}
+              editableItem={it}
+              isDragging={draggingId === it.id}
+              dragY={dragY}
+              onChangeDuration={changeDuration}
+              onRemove={removeItem}
+              onDragStart={handleDragStart}
+              onDragMove={handleDragMove}
+              onDragEnd={handleDragEnd}
+              onMeasureHeight={handleMeasureHeight}
+            />
           ))}
 
           <Button title="+ Dodaj pozycję" variant="secondary" style={styles.dashed} onPress={() => setPickerOpen((v) => !v)} />
@@ -163,21 +294,23 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: spacing.md,
   },
-  itemName: {
-    flex: 1,
-    fontSize: 15,
-    color: colors.textPrimary,
+  itemRowDragging: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+    zIndex: 10,
   },
-  stepButton: {
-    width: 28,
+  dragHandle: {
+    width: 22,
     height: 28,
-    borderRadius: radius.xs,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepLabel: {
-    fontSize: 16,
+  itemName: {
+    flex: 1,
+    fontSize: 15,
     color: colors.textPrimary,
   },
   itemTime: {
@@ -239,8 +372,7 @@ const styles = StyleSheet.create({
     color: colors.textTertiary,
   },
   footer: {
-    padding: spacing.xl,
+    paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxl,
-    backgroundColor: colors.background,
   },
 });
