@@ -14,6 +14,23 @@ describe('useExercisePoolStore', () => {
     useExercisePoolStore.getState().addExercise({ name: 'Nowa pozycja', duration: 20 });
     expect(useExercisePoolStore.getState().customExercises).toEqual([{ name: 'Nowa pozycja', duration: 20 }]);
   });
+
+  it('updateExerciseDuration changes the duration at the given index', () => {
+    useExercisePoolStore.getState().addExercise({ name: 'A', duration: 20 });
+    useExercisePoolStore.getState().addExercise({ name: 'B', duration: 30 });
+    useExercisePoolStore.getState().updateExerciseDuration(1, 45);
+    expect(useExercisePoolStore.getState().customExercises).toEqual([
+      { name: 'A', duration: 20 },
+      { name: 'B', duration: 45 },
+    ]);
+  });
+
+  it('removeExercise removes the exercise at the given index', () => {
+    useExercisePoolStore.getState().addExercise({ name: 'A', duration: 20 });
+    useExercisePoolStore.getState().addExercise({ name: 'B', duration: 30 });
+    useExercisePoolStore.getState().removeExercise(0);
+    expect(useExercisePoolStore.getState().customExercises).toEqual([{ name: 'B', duration: 30 }]);
+  });
 });
 
 describe('selectAllExercises', () => {

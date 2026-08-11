@@ -3,6 +3,7 @@ export { IconButton } from './IconButton';
 export { Card } from './Card';
 export { ScreenBackground } from './ScreenBackground';
 export { ScreenHeader } from './ScreenHeader';
+export { StepButton } from './StepButton';
 export { ProgressBar } from './ProgressBar';
 export { RingTimer } from './RingTimer';
 export { SequenceCard } from './SequenceCard';
