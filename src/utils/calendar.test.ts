@@ -1,6 +1,6 @@
 import type { DayEvent, HistoryEntry } from '@/types';
 import {
-  computeHourRange,
+  formatShortDate,
   getDoneDaysInMonth,
   getEventBlockPosition,
   getHourLabels,
@@ -39,24 +39,25 @@ describe('getWeekDays', () => {
     const today = new Date(2026, 7, 5);
     expect(getWeekDays(today, new Map(), 1)).toHaveLength(3);
   });
+
+  it('flags no day as today when the anchor week does not contain the real today', () => {
+    const anchor = new Date(2026, 6, 29); // a week before today
+    const realToday = new Date(2026, 7, 5);
+    const days = getWeekDays(anchor, new Map(), 3, realToday);
+    expect(days.some((d) => d.isToday)).toBe(false);
+  });
+
+  it('flags the real today even when it sits away from the anchor-centered window', () => {
+    const anchor = new Date(2026, 7, 6);
+    const realToday = new Date(2026, 7, 5);
+    const days = getWeekDays(anchor, new Map(), 3, realToday);
+    expect(days.find((d) => d.isToday)?.iso).toBe('2026-08-05');
+  });
 });
 
-describe('computeHourRange', () => {
-  it('falls back to 7-20 when there are no events', () => {
-    expect(computeHourRange([])).toEqual({ start: 7, end: 20 });
-  });
-
-  it('pads the range around the events and clamps to bounds', () => {
-    const events: DayEvent[] = [
-      { hour: 8, minute: 0, durationMinutes: 30, status: 'done' },
-      { hour: 18, minute: 30, durationMinutes: 30, status: 'planned' },
-    ];
-    expect(computeHourRange(events)).toEqual({ start: 7, end: 20 });
-  });
-
-  it('clamps to minStart/maxEnd', () => {
-    const events: DayEvent[] = [{ hour: 5, minute: 0, durationMinutes: 2000, status: 'done' }];
-    expect(computeHourRange(events, 6, 22)).toEqual({ start: 6, end: 22 });
+describe('formatShortDate', () => {
+  it('formats a day and abbreviated Polish month', () => {
+    expect(formatShortDate(new Date(2026, 7, 5))).toBe('5 sie');
   });
 });
 
@@ -97,6 +98,18 @@ describe('getMonthCells', () => {
     const cells = getMonthCells(new Date(2026, 7, 5), new Set(), new Set());
     const dayCells = cells.filter((c) => c.day !== null);
     expect(dayCells).toHaveLength(31); // August has 31 days
+  });
+
+  it('treats every day as past (done/missed) in a month before the real today, with no "today" cell', () => {
+    const viewedMonth = new Date(2026, 6, 1); // July, one month before real today
+    const realToday = new Date(2026, 7, 5);
+    const cells = getMonthCells(viewedMonth, new Set([3]), new Set(), realToday);
+    const dayCells = cells.filter((c) => c.day !== null);
+    expect(dayCells.some((c) => c.state === 'today' || c.state === 'todayDone')).toBe(false);
+    expect(dayCells.some((c) => c.state === 'rest' || c.state === 'planned')).toBe(false);
+    const byDay = new Map(dayCells.map((c) => [c.day, c.state]));
+    expect(byDay.get(3)).toBe('done');
+    expect(byDay.get(4)).toBe('missed');
   });
 });
 

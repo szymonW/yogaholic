@@ -1,6 +1,6 @@
 import { useAudioPlayer } from 'expo-audio';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CastButtonSafe } from '@/cast/CastButtonSafe';
@@ -51,13 +51,20 @@ export default function RunScreen() {
     router.replace(`/complete/${sequence.id}`);
   }, [phase, sequence, exercises, logSession, isCasting, sendRunState]);
 
-  // One beep per counted-down second, only during the "Przygotuj się" prep phase — never during
-  // the exercise itself.
+  // One beep per counted-down second during "Przygotuj się", plus a single beep the moment
+  // the exercise itself starts. Keyed by phase+runIndex(+remainingSeconds during prep) and
+  // deduped against the last key we actually beeped for, so re-renders that don't represent
+  // a genuinely new second/transition (e.g. an unrelated state change re-running this effect)
+  // can never fire an extra beep.
+  const lastBeepKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    if (phase !== 'prep' || !instructorVoiceEnabled) return;
+    if (!instructorVoiceEnabled || (phase !== 'prep' && phase !== 'exercise')) return;
+    const key = phase === 'prep' ? `prep:${runIndex}:${remainingSeconds}` : `exercise:${runIndex}`;
+    if (key === lastBeepKeyRef.current) return;
+    lastBeepKeyRef.current = key;
     prepBeep.seekTo(0);
     prepBeep.play();
-  }, [phase, remainingSeconds, instructorVoiceEnabled, prepBeep]);
+  }, [phase, runIndex, remainingSeconds, instructorVoiceEnabled, prepBeep]);
 
   // Mirrors the phone's timer state to the connected Chromecast receiver, once per tick.
   useEffect(() => {

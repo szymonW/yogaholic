@@ -7,7 +7,7 @@ import { selectAllExercises, useExercisePoolStore, useSequencesStore } from '@/s
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Exercise } from '@/types';
 import { goBack } from '@/utils/navigation';
-import { formatDuration } from '@/utils/time';
+import { formatDuration, formatDurationPadded } from '@/utils/time';
 
 const DURATION_STEP = 5;
 const DURATION_MIN = 10;
@@ -106,6 +106,7 @@ export default function CreateSequenceScreen() {
   const draggingIdRef = useRef<string | null>(null);
 
   const canSave = name.trim().length > 0 && items.length > 0;
+  const totalSeconds = items.reduce((sum, it) => sum + it.exercise.duration, 0);
   const addedCounts = items.reduce<Record<string, number>>((counts, it) => {
     counts[it.exercise.name] = (counts[it.exercise.name] ?? 0) + 1;
     return counts;
@@ -192,7 +193,11 @@ export default function CreateSequenceScreen() {
 
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title={isEditing ? 'Edytuj sekwencję' : 'Nowa sekwencja'} size="h2" onBack={goBack} />
+      <ScreenHeader
+        title={`${isEditing ? 'Edytuj sekwencję' : 'Nowa sekwencja'} (${formatDurationPadded(totalSeconds)})`}
+        size="h2"
+        onBack={goBack}
+      />
 
       <ScrollView contentContainerStyle={styles.content} scrollEnabled={draggingId === null}>
         <View style={styles.field}>

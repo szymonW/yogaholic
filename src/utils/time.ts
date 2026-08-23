@@ -11,3 +11,10 @@ export function formatDuration(totalSeconds: number): string {
 export function totalDuration(exercises: Exercise[]): string {
   return formatDuration(exercises.reduce((sum, exercise) => sum + exercise.duration, 0));
 }
+
+/** Formats whole seconds as zero-padded "mm:ss", e.g. 95 -> "01:35". */
+export function formatDurationPadded(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
