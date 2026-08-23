@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ScreenBackground, ScreenHeader } from '@/components';
+import { IconButton, ScreenBackground, ScreenHeader } from '@/components';
+import { ChevronLeftIcon } from '@/components/icons';
 import { useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
+import { addDays } from '@/utils/history';
 import {
-  computeHourRange,
+  formatShortDate,
   getDoneDaysInMonth,
   getEventBlockPosition,
   getHourLabels,
@@ -17,6 +20,7 @@ import { goBack } from '@/utils/navigation';
 
 const ROW_HEIGHT = 11;
 const GUTTER_WIDTH = 26;
+const HOUR_RANGE = { start: 0, end: 24 };
 // No scheduling feature exists yet, so there is nothing real to mark as "planned" —
 // left empty rather than inventing sessions the user never actually planned.
 const PLANNED_DAYS = new Set<number>();
@@ -40,21 +44,45 @@ export default function CalendarScreen() {
   const entries = useHistoryStore((state) => state.entries);
   const today = new Date();
 
-  const eventsByDate = historyToDayEvents(entries);
-  const weekDays = getWeekDays(today, eventsByDate);
-  const hourRange = computeHourRange(weekDays.flatMap((day) => day.events));
-  const hourLabels = getHourLabels(hourRange.start, hourRange.end, ROW_HEIGHT);
-  const gridHeight = (hourRange.end - hourRange.start) * ROW_HEIGHT;
+  // Both <= 0: 0 is the current week/month, -1 the previous one, etc. — navigated independently.
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
 
-  const doneDays = getDoneDaysInMonth(entries, today);
-  const monthCells = getMonthCells(today, doneDays, PLANNED_DAYS);
+  const weekAnchor = addDays(today, weekOffset * 7);
+  const monthAnchor = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+
+  const eventsByDate = historyToDayEvents(entries);
+  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today);
+  const hourLabels = getHourLabels(HOUR_RANGE.start, HOUR_RANGE.end, ROW_HEIGHT);
+  const gridHeight = (HOUR_RANGE.end - HOUR_RANGE.start) * ROW_HEIGHT;
+  const weekLabel = weekOffset === 0 ? 'Ten tydzień' : `${formatShortDate(weekDays[0].date)} – ${formatShortDate(weekDays[6].date)}`;
+
+  const doneDays = getDoneDaysInMonth(entries, monthAnchor);
+  const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today);
 
   return (
     <ScreenBackground style={styles.root}>
       <ScreenHeader title="Kalendarz" onBack={goBack} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Ten tydzień</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionLabel}>{weekLabel}</Text>
+            <View style={styles.navButtons}>
+              <IconButton accessibilityLabel="Poprzedni tydzień" size={28} onPress={() => setWeekOffset((v) => v - 1)}>
+                <ChevronLeftIcon size={14} />
+              </IconButton>
+              <IconButton
+                accessibilityLabel="Następny tydzień"
+                size={28}
+                disabled={weekOffset === 0}
+                onPress={() => setWeekOffset((v) => Math.min(0, v + 1))}
+              >
+                <View style={styles.chevronRight}>
+                  <ChevronLeftIcon size={14} />
+                </View>
+              </IconButton>
+            </View>
+          </View>
 
           <View style={styles.weekHeaderRow}>
             <View style={{ width: GUTTER_WIDTH }} />
@@ -76,7 +104,7 @@ export default function CalendarScreen() {
             {weekDays.map((day) => (
               <View key={day.iso} style={[styles.dayColumn, { height: gridHeight }]}>
                 {day.events.map((event, index) => {
-                  const { topPx, heightPx } = getEventBlockPosition(event, hourRange.start, ROW_HEIGHT);
+                  const { topPx, heightPx } = getEventBlockPosition(event, HOUR_RANGE.start, ROW_HEIGHT);
                   return (
                     <View
                       key={index}
@@ -94,7 +122,24 @@ export default function CalendarScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{getMonthLabel(today)}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionLabel}>{getMonthLabel(monthAnchor)}</Text>
+            <View style={styles.navButtons}>
+              <IconButton accessibilityLabel="Poprzedni miesiąc" size={28} onPress={() => setMonthOffset((v) => v - 1)}>
+                <ChevronLeftIcon size={14} />
+              </IconButton>
+              <IconButton
+                accessibilityLabel="Następny miesiąc"
+                size={28}
+                disabled={monthOffset === 0}
+                onPress={() => setMonthOffset((v) => Math.min(0, v + 1))}
+              >
+                <View style={styles.chevronRight}>
+                  <ChevronLeftIcon size={14} />
+                </View>
+              </IconButton>
+            </View>
+          </View>
           <View style={styles.monthHeaderRow}>
             {['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'].map((label) => (
               <Text key={label} style={styles.monthHeaderLabel}>
@@ -146,11 +191,23 @@ const styles = StyleSheet.create({
   section: {
     gap: spacing.sm,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   sectionLabel: {
     fontSize: 13,
     color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  navButtons: {
+    flexDirection: 'row',
+    gap: spacing.xs,
+  },
+  chevronRight: {
+    transform: [{ rotate: '180deg' }],
   },
   weekHeaderRow: {
     flexDirection: 'row',

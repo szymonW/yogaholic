@@ -18,6 +18,8 @@ const MONTH_NAMES_PL = [
   'Grudzień',
 ];
 
+const MONTH_NAMES_SHORT_PL = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
+
 export interface WeekDayInfo {
   date: Date;
   iso: string;
@@ -27,32 +29,33 @@ export interface WeekDayInfo {
   events: DayEvent[];
 }
 
-/** `today` ± `radius` days, mirroring the mockup's 7-day week strip. */
-export function getWeekDays(today: Date, eventsByISODate: Map<string, DayEvent[]>, radius = 3): WeekDayInfo[] {
+/**
+ * `anchor` ± `radius` days, mirroring the mockup's 7-day week strip. `today` (defaults to
+ * `anchor`) is the real current date, used only to flag which day (if any) is "today" — pass
+ * it explicitly when `anchor` has been moved to a past week so an arbitrary day in that window
+ * doesn't get mislabeled as today.
+ */
+export function getWeekDays(anchor: Date, eventsByISODate: Map<string, DayEvent[]>, radius = 3, today: Date = anchor): WeekDayInfo[] {
+  const todayISO = toISODate(today);
   const days: WeekDayInfo[] = [];
   for (let offset = -radius; offset <= radius; offset++) {
-    const date = addDays(today, offset);
+    const date = addDays(anchor, offset);
     const iso = toISODate(date);
     days.push({
       date,
       iso,
       letter: WEEKDAY_LETTERS_PL[(date.getDay() + 6) % 7],
       dayNumber: date.getDate(),
-      isToday: offset === 0,
+      isToday: iso === todayISO,
       events: eventsByISODate.get(iso) ?? [],
     });
   }
   return days;
 }
 
-/** Hour range to render the day grid over, padded by 1h and clamped to [minStart, maxEnd]. */
-export function computeHourRange(events: DayEvent[], minStart = 6, maxEnd = 22): { start: number; end: number } {
-  if (events.length === 0) return { start: 7, end: 20 };
-  const starts = events.map((event) => event.hour);
-  const ends = events.map((event) => event.hour + event.durationMinutes / 60);
-  const start = Math.max(minStart, Math.floor(Math.min(...starts)) - 1);
-  const end = Math.min(maxEnd, Math.ceil(Math.max(...ends)) + 1);
-  return { start, end };
+/** "5 sie" — a short day+month label for a week's date range. */
+export function formatShortDate(date: Date): string {
+  return `${date.getDate()} ${MONTH_NAMES_SHORT_PL[date.getMonth()]}`;
 }
 
 export type MonthCellState = 'empty' | 'today' | 'todayDone' | 'done' | 'missed' | 'planned' | 'rest';
@@ -67,13 +70,21 @@ export function getMonthLabel(today: Date): string {
 }
 
 /**
- * Always renders `today`'s month (the mockup has no prev/next month navigation).
- * `doneDays`/`plannedDays` are day-of-month numbers.
+ * Renders `viewedMonth`'s grid. `today` (defaults to `viewedMonth`) is the real current date —
+ * pass it explicitly once `viewedMonth` has been navigated away from the current month, so
+ * "today"/past/future is judged against the real date rather than the viewed month's own days.
  */
-export function getMonthCells(today: Date, doneDays: Set<number>, plannedDays: Set<number>): MonthCell[] {
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const todayDay = today.getDate();
+export function getMonthCells(
+  viewedMonth: Date,
+  doneDays: Set<number>,
+  plannedDays: Set<number>,
+  today: Date = viewedMonth
+): MonthCell[] {
+  const year = viewedMonth.getFullYear();
+  const month = viewedMonth.getMonth();
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
+  const todayDay = isCurrentMonth ? today.getDate() : -1;
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
   const startOffset = (new Date(year, month, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -82,7 +93,7 @@ export function getMonthCells(today: Date, doneDays: Set<number>, plannedDays: S
   for (let day = 1; day <= daysInMonth; day++) {
     let state: MonthCellState;
     if (day === todayDay) state = doneDays.has(day) ? 'todayDone' : 'today';
-    else if (day < todayDay) state = doneDays.has(day) ? 'done' : 'missed';
+    else if (new Date(year, month, day).getTime() < startOfToday) state = doneDays.has(day) ? 'done' : 'missed';
     else state = plannedDays.has(day) ? 'planned' : 'rest';
     cells.push({ day, state });
   }
