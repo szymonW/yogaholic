@@ -52,3 +52,5 @@ yarn-error.*
 .claude/settings.local.json
 # hardcodes an absolute path to this machine's nvm node binary — regenerate locally if needed
 .claude/launch.json
+# auto-commit hook runtime state (session -> branch mapping)
+.claude/.session-branches.json
