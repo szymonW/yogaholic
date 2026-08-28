@@ -3,17 +3,20 @@ import { persist } from 'zustand/middleware';
 import { storage } from './storage';
 
 // Clamp bounds ported 1:1 from the mockup's incGoalSessions/decGoalMinutes etc.
-const SESSIONS_MIN = 1;
-const SESSIONS_MAX = 14;
+const DAY_SESSIONS_MIN = 0;
+const DAY_SESSIONS_MAX = 5;
 const MINUTES_MIN = 5;
 const MINUTES_MAX = 600;
 const MINUTES_STEP = 5;
 
+// Per-day session targets, Mon–Sun — matches the calendar's Pn–Nd week order.
+const DEFAULT_SESSIONS_PER_DAY = [1, 1, 0, 1, 1, 0, 1];
+
 interface GoalsState {
-  goalSessions: number;
+  sessionsPerDay: number[];
   goalMinutes: number;
-  incGoalSessions: () => void;
-  decGoalSessions: () => void;
+  incSessionDay: (day: number) => void;
+  decSessionDay: (day: number) => void;
   incGoalMinutes: () => void;
   decGoalMinutes: () => void;
 }
@@ -21,10 +24,20 @@ interface GoalsState {
 export const useGoalsStore = create<GoalsState>()(
   persist(
     (set) => ({
-      goalSessions: 4,
+      sessionsPerDay: DEFAULT_SESSIONS_PER_DAY,
       goalMinutes: 60,
-      incGoalSessions: () => set((state) => ({ goalSessions: Math.min(SESSIONS_MAX, state.goalSessions + 1) })),
-      decGoalSessions: () => set((state) => ({ goalSessions: Math.max(SESSIONS_MIN, state.goalSessions - 1) })),
+      incSessionDay: (day) =>
+        set((state) => {
+          const sessionsPerDay = [...state.sessionsPerDay];
+          sessionsPerDay[day] = Math.min(DAY_SESSIONS_MAX, sessionsPerDay[day] + 1);
+          return { sessionsPerDay };
+        }),
+      decSessionDay: (day) =>
+        set((state) => {
+          const sessionsPerDay = [...state.sessionsPerDay];
+          sessionsPerDay[day] = Math.max(DAY_SESSIONS_MIN, sessionsPerDay[day] - 1);
+          return { sessionsPerDay };
+        }),
       incGoalMinutes: () => set((state) => ({ goalMinutes: Math.min(MINUTES_MAX, state.goalMinutes + MINUTES_STEP) })),
       decGoalMinutes: () => set((state) => ({ goalMinutes: Math.max(MINUTES_MIN, state.goalMinutes - MINUTES_STEP) })),
     }),

@@ -1,26 +1,26 @@
 import { useGoalsStore } from './goalsStore';
 
 beforeEach(() => {
-  useGoalsStore.setState({ goalSessions: 4, goalMinutes: 60 });
+  useGoalsStore.setState({ sessionsPerDay: [1, 1, 0, 1, 1, 0, 1], goalMinutes: 60 });
 });
 
 describe('useGoalsStore', () => {
-  it('increments and decrements goalSessions', () => {
-    useGoalsStore.getState().incGoalSessions();
-    expect(useGoalsStore.getState().goalSessions).toBe(5);
-    useGoalsStore.getState().decGoalSessions();
-    useGoalsStore.getState().decGoalSessions();
-    expect(useGoalsStore.getState().goalSessions).toBe(3);
+  it('increments and decrements a single day, leaving the others untouched', () => {
+    useGoalsStore.getState().incSessionDay(2);
+    expect(useGoalsStore.getState().sessionsPerDay).toEqual([1, 1, 1, 1, 1, 0, 1]);
+
+    useGoalsStore.getState().decSessionDay(0);
+    expect(useGoalsStore.getState().sessionsPerDay).toEqual([0, 1, 1, 1, 1, 0, 1]);
   });
 
-  it('clamps goalSessions to [1, 14]', () => {
-    useGoalsStore.setState({ goalSessions: 14 });
-    useGoalsStore.getState().incGoalSessions();
-    expect(useGoalsStore.getState().goalSessions).toBe(14);
+  it('clamps a day to [0, 5]', () => {
+    useGoalsStore.setState({ sessionsPerDay: [0, 1, 0, 1, 1, 0, 1] });
+    useGoalsStore.getState().decSessionDay(0);
+    expect(useGoalsStore.getState().sessionsPerDay[0]).toBe(0);
 
-    useGoalsStore.setState({ goalSessions: 1 });
-    useGoalsStore.getState().decGoalSessions();
-    expect(useGoalsStore.getState().goalSessions).toBe(1);
+    useGoalsStore.setState({ sessionsPerDay: [5, 1, 0, 1, 1, 0, 1] });
+    useGoalsStore.getState().incSessionDay(0);
+    expect(useGoalsStore.getState().sessionsPerDay[0]).toBe(5);
   });
 
   it('steps goalMinutes by 5 and clamps to [5, 600]', () => {

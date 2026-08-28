@@ -35,7 +35,8 @@ export default function Home() {
 
   const recentCount = useSequencesStore((state) => state.recentIds.length);
   const customCount = useSequencesStore((state) => state.customSequences.length);
-  const goalSessions = useGoalsStore((state) => state.goalSessions);
+  const sessionsPerDay = useGoalsStore((state) => state.sessionsPerDay);
+  const goalSessions = sessionsPerDay.reduce((sum, count) => sum + count, 0);
   const entries = useHistoryStore((state) => state.entries);
 
   const today = new Date();
