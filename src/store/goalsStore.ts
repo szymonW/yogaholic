@@ -10,7 +10,8 @@ const MINUTES_MAX = 600;
 const MINUTES_STEP = 5;
 
 // Per-day session targets, Mon–Sun — matches the calendar's Pn–Nd week order.
-const DEFAULT_SESSIONS_PER_DAY = [1, 1, 0, 1, 1, 0, 1];
+// Starts at all zeros: a fresh install has no goals set yet.
+const DEFAULT_SESSIONS_PER_DAY = [0, 0, 0, 0, 0, 0, 0];
 
 interface GoalsState {
   sessionsPerDay: number[];

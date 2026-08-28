@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { IconButton, ScreenBackground, ScreenHeader } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
-import { useHistoryStore } from '@/store';
+import { useGoalsStore, useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { addDays } from '@/utils/history';
 import {
@@ -44,12 +44,14 @@ const MONTH_CELL_STYLES: Record<
   todayDone: { backgroundColor: colors.calendarDoneBg + '48', borderColor: colors.accent, borderStyle: 'solid', textColor: colors.textPrimary },
   done: { backgroundColor: colors.calendarDoneBg + '48', textColor: colors.textPrimary },
   missed: { backgroundColor: 'transparent', textColor: colors.textFaint },
+  missedGoal: { backgroundColor: colors.danger + '48', textColor: colors.textPrimary },
   planned: { backgroundColor: 'transparent', borderColor: colors.accentDashed, borderStyle: 'dashed', textColor: colors.textPrimary },
   rest: { backgroundColor: 'transparent', textColor: colors.textTertiary },
 };
 
 export default function CalendarScreen() {
   const entries = useHistoryStore((state) => state.entries);
+  const sessionsPerDay = useGoalsStore((state) => state.sessionsPerDay);
   const today = new Date();
 
   // Both <= 0: 0 is the current week/month, -1 the previous one, etc. — navigated independently.
@@ -60,13 +62,13 @@ export default function CalendarScreen() {
   const monthAnchor = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
 
   const eventsByDate = historyToDayEvents(entries);
-  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today);
+  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today, sessionsPerDay);
   const hourLabels = getHourLabels(HOUR_RANGE.start, HOUR_RANGE.end, ROW_HEIGHT);
   const gridHeight = (HOUR_RANGE.end - HOUR_RANGE.start) * ROW_HEIGHT;
   const weekLabel = weekOffset === 0 ? 'Ten tydzień' : `${formatShortDate(weekDays[0].date)} – ${formatShortDate(weekDays[6].date)}`;
 
   const doneDays = getDoneDaysInMonth(entries, monthAnchor);
-  const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today);
+  const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today, sessionsPerDay);
 
   const goToToday = () => {
     setWeekOffset(0);
@@ -119,14 +121,14 @@ export default function CalendarScreen() {
           <View style={styles.monthGrid}>
             {monthCells.map((cell, index) => {
               const cellStyle = MONTH_CELL_STYLES[cell.state];
-              // "Done" fills are round badges; every other marker keeps the old full-cell rect.
-              const isDone = cell.state === 'done' || cell.state === 'todayDone';
+              // "Done"/"missed goal" fills are round badges; every other marker keeps the old full-cell rect.
+              const isBadge = cell.state === 'done' || cell.state === 'todayDone' || cell.state === 'missedGoal';
               return (
                 <View key={index} style={styles.monthCell}>
                   {cell.day !== null ? (
                     <View
                       style={[
-                        isDone ? styles.monthCellBadge : styles.monthCellFill,
+                        isBadge ? styles.monthCellBadge : styles.monthCellFill,
                         {
                           backgroundColor: cellStyle.backgroundColor,
                           borderColor: cellStyle.borderColor,
@@ -146,6 +148,10 @@ export default function CalendarScreen() {
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: colors.calendarDoneBg + '48' }]} />
               <Text style={styles.legendLabel}>Wykonane</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: colors.danger + '48' }]} />
+              <Text style={styles.legendLabel}>Nieosiągnięty cel</Text>
             </View>
             {/* "Zaplanowane" is left out until a real scheduling feature exists — see PLANNED_DAYS above. */}
           </View>
@@ -189,7 +195,7 @@ export default function CalendarScreen() {
               ))}
             </View>
             {weekDays.map((day) => (
-              <View key={day.iso} style={[styles.dayColumn, { height: gridHeight }]}>
+              <View key={day.iso} style={[styles.dayColumn, day.missedGoal && styles.dayColumnMissedGoal, { height: gridHeight }]}>
                 {day.events.map((event, index) => {
                   const { topPx, heightPx } = getEventBlockPosition(event, HOUR_RANGE.start, ROW_HEIGHT);
                   return (
@@ -297,6 +303,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: colors.surface + '80',
     borderRadius: 6,
+  },
+  dayColumnMissedGoal: {
+    backgroundColor: colors.danger + '30',
   },
   eventBlock: {
     position: 'absolute',
