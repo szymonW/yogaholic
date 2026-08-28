@@ -18,9 +18,14 @@ import {
 } from '@/utils/calendar';
 import { goBack } from '@/utils/navigation';
 
-const ROW_HEIGHT = 11;
+const ROW_HEIGHT = 11 * 0.8; // 20% shorter than the original 11px/hour
 const GUTTER_WIDTH = 26;
 const HOUR_RANGE = { start: 0, end: 24 };
+// Fixed cell height for the month grid, decoupled from screen width. Rows are pinned to 6 —
+// March 2026 (6 rows, the max a month ever needs) — so the section height never jumps as the
+// user navigates between shorter and longer months.
+const MONTH_CELL_HEIGHT = 34;
+const MONTH_ROWS = 6;
 // No scheduling feature exists yet, so there is nothing real to mark as "planned" —
 // left empty rather than inventing sessions the user never actually planned.
 const PLANNED_DAYS = new Set<number>();
@@ -279,10 +284,11 @@ const styles = StyleSheet.create({
   monthGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    height: MONTH_CELL_HEIGHT * MONTH_ROWS,
   },
   monthCell: {
     width: `${100 / 7}%`,
-    aspectRatio: 1,
+    height: MONTH_CELL_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.sm,
