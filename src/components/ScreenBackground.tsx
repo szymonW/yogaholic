@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { Image, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { colors } from '@/theme';
 
-// Native pixel size of peace-bg.jpg (675x1200) — used to scale it to full container height
+// Native pixel size of peace-bg.png (1280x1920) — used to scale it to full container height
 // while keeping its aspect ratio, instead of letting resizeMode="cover" crop top/bottom.
-const BG_ASPECT_RATIO = 675 / 1200;
+const BG_ASPECT_RATIO = 1280 / 1920;
 
 interface ScreenBackgroundProps {
   children?: ReactNode;
@@ -15,7 +15,7 @@ export function ScreenBackground({ children, style }: ScreenBackgroundProps) {
   return (
     <View style={styles.root}>
       <View style={styles.bgClip} pointerEvents="none">
-        <Image source={require('../../assets/backgrounds/peace-bg.jpg')} style={styles.bg} resizeMode="cover" />
+        <Image source={require('../../assets/backgrounds/peace-bg.png')} style={styles.bg} resizeMode="cover" />
       </View>
       <View style={[styles.content, style]}>{children}</View>
     </View>
