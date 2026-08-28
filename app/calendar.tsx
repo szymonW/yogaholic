@@ -244,19 +244,19 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   todayButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: colors.accent,
+    borderRadius: radius.md,
+    paddingVertical: 11,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
   },
   todayButtonPressed: {
-    opacity: 0.7,
+    opacity: 0.8,
   },
   todayButtonLabel: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.accentOn,
   },
   chevronRight: {
     transform: [{ rotate: '180deg' }],
