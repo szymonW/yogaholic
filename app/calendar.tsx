@@ -64,6 +64,62 @@ export default function CalendarScreen() {
     <ScreenBackground style={styles.root}>
       <ScreenHeader title="Kalendarz" onBack={goBack} />
       <ScrollView contentContainerStyle={styles.content}>
+        <View style={[styles.section, styles.monthSection]}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionLabel}>{getMonthLabel(monthAnchor)}</Text>
+            <View style={styles.navButtons}>
+              <IconButton accessibilityLabel="Poprzedni miesiąc" size={28} onPress={() => setMonthOffset((v) => v - 1)}>
+                <ChevronLeftIcon size={14} />
+              </IconButton>
+              <IconButton
+                accessibilityLabel="Następny miesiąc"
+                size={28}
+                disabled={monthOffset === 0}
+                onPress={() => setMonthOffset((v) => Math.min(0, v + 1))}
+              >
+                <View style={styles.chevronRight}>
+                  <ChevronLeftIcon size={14} />
+                </View>
+              </IconButton>
+            </View>
+          </View>
+          <View style={styles.monthHeaderRow}>
+            {['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'].map((label) => (
+              <Text key={label} style={styles.monthHeaderLabel}>
+                {label}
+              </Text>
+            ))}
+          </View>
+          <View style={styles.monthGrid}>
+            {monthCells.map((cell, index) => {
+              const cellStyle = MONTH_CELL_STYLES[cell.state];
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.monthCell,
+                    {
+                      backgroundColor: cellStyle.backgroundColor,
+                      borderColor: cellStyle.borderColor,
+                      borderStyle: cellStyle.borderStyle,
+                      borderWidth: cellStyle.borderColor ? 1.5 : 0,
+                    },
+                  ]}
+                >
+                  {cell.day !== null ? <Text style={[styles.monthCellText, { color: cellStyle.textColor }]}>{cell.day}</Text> : null}
+                </View>
+              );
+            })}
+          </View>
+          <View style={styles.legend}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: colors.calendarDoneBg + '48' }]} />
+              <Text style={styles.legendLabel}>Wykonane</Text>
+            </View>
+            {/* "Zaplanowane" is left out until a real scheduling feature exists — see PLANNED_DAYS above. */}
+          </View>
+        </View>
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionLabel}>{weekLabel}</Text>
@@ -120,62 +176,6 @@ export default function CalendarScreen() {
             ))}
           </View>
         </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>{getMonthLabel(monthAnchor)}</Text>
-            <View style={styles.navButtons}>
-              <IconButton accessibilityLabel="Poprzedni miesiąc" size={28} onPress={() => setMonthOffset((v) => v - 1)}>
-                <ChevronLeftIcon size={14} />
-              </IconButton>
-              <IconButton
-                accessibilityLabel="Następny miesiąc"
-                size={28}
-                disabled={monthOffset === 0}
-                onPress={() => setMonthOffset((v) => Math.min(0, v + 1))}
-              >
-                <View style={styles.chevronRight}>
-                  <ChevronLeftIcon size={14} />
-                </View>
-              </IconButton>
-            </View>
-          </View>
-          <View style={styles.monthHeaderRow}>
-            {['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'].map((label) => (
-              <Text key={label} style={styles.monthHeaderLabel}>
-                {label}
-              </Text>
-            ))}
-          </View>
-          <View style={styles.monthGrid}>
-            {monthCells.map((cell, index) => {
-              const cellStyle = MONTH_CELL_STYLES[cell.state];
-              return (
-                <View
-                  key={index}
-                  style={[
-                    styles.monthCell,
-                    {
-                      backgroundColor: cellStyle.backgroundColor,
-                      borderColor: cellStyle.borderColor,
-                      borderStyle: cellStyle.borderStyle,
-                      borderWidth: cellStyle.borderColor ? 1.5 : 0,
-                    },
-                  ]}
-                >
-                  {cell.day !== null ? <Text style={[styles.monthCellText, { color: cellStyle.textColor }]}>{cell.day}</Text> : null}
-                </View>
-              );
-            })}
-          </View>
-          <View style={styles.legend}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: colors.calendarDoneBg + '48' }]} />
-              <Text style={styles.legendLabel}>Wykonane</Text>
-            </View>
-            {/* "Zaplanowane" is left out until a real scheduling feature exists — see PLANNED_DAYS above. */}
-          </View>
-        </View>
       </ScrollView>
     </ScreenBackground>
   );
@@ -190,6 +190,12 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: spacing.sm,
+  },
+  monthSection: {
+    backgroundColor: colors.surface + '40',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginHorizontal: -spacing.md,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -243,7 +249,7 @@ const styles = StyleSheet.create({
   dayColumn: {
     flex: 1,
     position: 'relative',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surface + '80',
     borderRadius: 6,
   },
   eventBlock: {
