@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, typography } from '@/theme';
@@ -10,9 +11,11 @@ interface ScreenHeaderProps {
   onBack: () => void;
   /** h1 (30px) is used by section screens, h2 (28px) by detail/create screens with a subtitle. */
   size?: 'h1' | 'h2';
+  /** Optional control rendered on the same line as the title, right-aligned (e.g. a "Today" button). */
+  action?: ReactNode;
 }
 
-export function ScreenHeader({ title, subtitle, onBack, size = 'h1' }: ScreenHeaderProps) {
+export function ScreenHeader({ title, subtitle, onBack, size = 'h1', action }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -20,7 +23,10 @@ export function ScreenHeader({ title, subtitle, onBack, size = 'h1' }: ScreenHea
       <IconButton onPress={onBack} accessibilityLabel="Wstecz">
         <ChevronLeftIcon />
       </IconButton>
-      <Text style={[typography[size], styles.title]}>{title}</Text>
+      <View style={styles.titleRow}>
+        <Text style={[typography[size], styles.title]}>{title}</Text>
+        {action}
+      </View>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>
   );
@@ -32,6 +38,11 @@ const styles = StyleSheet.create({
     gap: spacing.lg - 2,
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.md,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   title: {
     color: colors.textPrimary,

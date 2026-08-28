@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { IconButton, ScreenBackground, ScreenHeader } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
 import { useHistoryStore } from '@/store';
@@ -26,6 +26,9 @@ const HOUR_RANGE = { start: 0, end: 24 };
 // user navigates between shorter and longer months.
 const MONTH_CELL_HEIGHT = 34;
 const MONTH_ROWS = 6;
+// Fixed square badge for the day marker, so "done"/"today" fills render as a true circle
+// regardless of the (non-square) cell's own width/height.
+const MONTH_BADGE_SIZE = 26;
 // No scheduling feature exists yet, so there is nothing real to mark as "planned" —
 // left empty rather than inventing sessions the user never actually planned.
 const PLANNED_DAYS = new Set<number>();
@@ -65,9 +68,27 @@ export default function CalendarScreen() {
   const doneDays = getDoneDaysInMonth(entries, monthAnchor);
   const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today);
 
+  const goToToday = () => {
+    setWeekOffset(0);
+    setMonthOffset(0);
+  };
+
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title="Kalendarz" onBack={goBack} />
+      <ScreenHeader
+        title="Kalendarz"
+        onBack={goBack}
+        action={
+          <Pressable
+            onPress={goToToday}
+            accessibilityRole="button"
+            accessibilityLabel="Przejdź do dzisiaj"
+            style={({ pressed }) => [styles.todayButton, pressed && styles.todayButtonPressed]}
+          >
+            <Text style={styles.todayButtonLabel}>Dzisiaj</Text>
+          </Pressable>
+        }
+      />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.section, styles.monthSection]}>
           <View style={styles.sectionHeader}>
@@ -98,20 +119,25 @@ export default function CalendarScreen() {
           <View style={styles.monthGrid}>
             {monthCells.map((cell, index) => {
               const cellStyle = MONTH_CELL_STYLES[cell.state];
+              // "Done" fills are round badges; every other marker keeps the old full-cell rect.
+              const isDone = cell.state === 'done' || cell.state === 'todayDone';
               return (
-                <View
-                  key={index}
-                  style={[
-                    styles.monthCell,
-                    {
-                      backgroundColor: cellStyle.backgroundColor,
-                      borderColor: cellStyle.borderColor,
-                      borderStyle: cellStyle.borderStyle,
-                      borderWidth: cellStyle.borderColor ? 1.5 : 0,
-                    },
-                  ]}
-                >
-                  {cell.day !== null ? <Text style={[styles.monthCellText, { color: cellStyle.textColor }]}>{cell.day}</Text> : null}
+                <View key={index} style={styles.monthCell}>
+                  {cell.day !== null ? (
+                    <View
+                      style={[
+                        isDone ? styles.monthCellBadge : styles.monthCellFill,
+                        {
+                          backgroundColor: cellStyle.backgroundColor,
+                          borderColor: cellStyle.borderColor,
+                          borderStyle: cellStyle.borderStyle,
+                          borderWidth: cellStyle.borderColor ? 1.5 : 0,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.monthCellText, { color: cellStyle.textColor }]}>{cell.day}</Text>
+                    </View>
+                  ) : null}
                 </View>
               );
             })}
@@ -217,6 +243,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.xs,
   },
+  todayButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  todayButtonPressed: {
+    opacity: 0.7,
+  },
+  todayButtonLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
   chevronRight: {
     transform: [{ rotate: '180deg' }],
   },
@@ -264,7 +305,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   eventDone: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.calendarDoneBg,
   },
   eventPlanned: {
     borderWidth: 1.5,
@@ -291,7 +332,20 @@ const styles = StyleSheet.create({
     height: MONTH_CELL_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  monthCellFill: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: radius.sm,
+  },
+  monthCellBadge: {
+    width: MONTH_BADGE_SIZE,
+    height: MONTH_BADGE_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: MONTH_BADGE_SIZE / 2,
   },
   monthCellText: {
     fontSize: 13,
