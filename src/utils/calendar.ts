@@ -27,7 +27,7 @@ export interface WeekDayInfo {
   dayNumber: number;
   isToday: boolean;
   events: DayEvent[];
-  /** Past day with a session goal (see `sessionsPerDay`) that wasn't met. */
+  /** Past day with a session goal (see `getSessionGoal`) that wasn't met. */
   missedGoal: boolean;
 }
 
@@ -35,15 +35,16 @@ export interface WeekDayInfo {
  * `anchor` ± `radius` days, mirroring the mockup's 7-day week strip. `today` (defaults to
  * `anchor`) is the real current date, used only to flag which day (if any) is "today" — pass
  * it explicitly when `anchor` has been moved to a past week so an arbitrary day in that window
- * doesn't get mislabeled as today. `sessionsPerDay` (Mon–Sun, from the goals screen) flags a
- * past, event-less day as a missed goal only when that weekday actually has a nonzero target.
+ * doesn't get mislabeled as today. `getSessionGoal` (from the goals screen) returns the session
+ * goal that was in effect *on that specific date* — a later goal change must never retroactively
+ * relabel an earlier day — and flags a past, event-less day as a missed goal only when it's nonzero.
  */
 export function getWeekDays(
   anchor: Date,
   eventsByISODate: Map<string, DayEvent[]>,
   radius = 3,
   today: Date = anchor,
-  sessionsPerDay: number[] = new Array(7).fill(0)
+  getSessionGoal: (date: Date) => number = () => 0
 ): WeekDayInfo[] {
   const todayISO = toISODate(today);
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
@@ -52,15 +53,14 @@ export function getWeekDays(
     const date = addDays(anchor, offset);
     const iso = toISODate(date);
     const events = eventsByISODate.get(iso) ?? [];
-    const weekdayIndex = (date.getDay() + 6) % 7;
     days.push({
       date,
       iso,
-      letter: WEEKDAY_LETTERS_PL[weekdayIndex],
+      letter: WEEKDAY_LETTERS_PL[(date.getDay() + 6) % 7],
       dayNumber: date.getDate(),
       isToday: iso === todayISO,
       events,
-      missedGoal: date.getTime() < startOfToday && events.length === 0 && sessionsPerDay[weekdayIndex] > 0,
+      missedGoal: date.getTime() < startOfToday && events.length === 0 && getSessionGoal(date) > 0,
     });
   }
   return days;
@@ -86,15 +86,17 @@ export function getMonthLabel(today: Date): string {
  * Renders `viewedMonth`'s grid. `today` (defaults to `viewedMonth`) is the real current date —
  * pass it explicitly once `viewedMonth` has been navigated away from the current month, so
  * "today"/past/future is judged against the real date rather than the viewed month's own days.
- * `sessionsPerDay` (Mon–Sun, from the goals screen) decides how a past, non-done day reads: a
- * weekday with no goal (0) is plain "missed" (unmarked), one with a goal is "missedGoal" (flagged).
+ * `getSessionGoal` (from the goals screen) returns the session goal that was in effect *on that
+ * specific date* — a later goal change must never retroactively relabel an earlier day. A past,
+ * non-done day reads as plain "missed" (unmarked) when that goal was 0, or "missedGoal" (flagged)
+ * when it wasn't.
  */
 export function getMonthCells(
   viewedMonth: Date,
   doneDays: Set<number>,
   plannedDays: Set<number>,
   today: Date = viewedMonth,
-  sessionsPerDay: number[] = new Array(7).fill(0)
+  getSessionGoal: (date: Date) => number = () => 0
 ): MonthCell[] {
   const year = viewedMonth.getFullYear();
   const month = viewedMonth.getMonth();
@@ -112,10 +114,7 @@ export function getMonthCells(
     if (day === todayDay) state = doneDays.has(day) ? 'todayDone' : 'today';
     else if (date.getTime() < startOfToday) {
       if (doneDays.has(day)) state = 'done';
-      else {
-        const weekdayIndex = (date.getDay() + 6) % 7;
-        state = sessionsPerDay[weekdayIndex] > 0 ? 'missedGoal' : 'missed';
-      }
+      else state = getSessionGoal(date) > 0 ? 'missedGoal' : 'missed';
     } else state = plannedDays.has(day) ? 'planned' : 'rest';
     cells.push({ day, state });
   }

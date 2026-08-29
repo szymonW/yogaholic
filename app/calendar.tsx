@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { IconButton, ScreenBackground, ScreenHeader } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
-import { useGoalsStore, useHistoryStore } from '@/store';
+import { getSessionGoalForDate, useGoalsStore, useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { addDays } from '@/utils/history';
 import {
@@ -51,8 +51,11 @@ const MONTH_CELL_STYLES: Record<
 
 export default function CalendarScreen() {
   const entries = useHistoryStore((state) => state.entries);
-  const sessionsPerDay = useGoalsStore((state) => state.sessionsPerDay);
+  const goalHistory = useGoalsStore((state) => state.goalHistory);
   const today = new Date();
+  // A goal change only ever applies from today onward — never retroactively — so each date must
+  // resolve against whatever goal snapshot was actually in effect on that date.
+  const getSessionGoal = (date: Date) => getSessionGoalForDate(goalHistory, date);
 
   // Both <= 0: 0 is the current week/month, -1 the previous one, etc. — navigated independently.
   const [weekOffset, setWeekOffset] = useState(0);
@@ -62,13 +65,13 @@ export default function CalendarScreen() {
   const monthAnchor = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
 
   const eventsByDate = historyToDayEvents(entries);
-  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today, sessionsPerDay);
+  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today, getSessionGoal);
   const hourLabels = getHourLabels(HOUR_RANGE.start, HOUR_RANGE.end, ROW_HEIGHT);
   const gridHeight = (HOUR_RANGE.end - HOUR_RANGE.start) * ROW_HEIGHT;
   const weekLabel = weekOffset === 0 ? 'Ten tydzień' : `${formatShortDate(weekDays[0].date)} – ${formatShortDate(weekDays[6].date)}`;
 
   const doneDays = getDoneDaysInMonth(entries, monthAnchor);
-  const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today, sessionsPerDay);
+  const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today, getSessionGoal);
 
   const goToToday = () => {
     setWeekOffset(0);

@@ -16,6 +16,9 @@ const historyEntry = (dateISO: string, hour: number, minute: number, durationSec
   return { id: `${sequenceId}-${dateISO}`, sequenceId, dateISO, startedAtMs, durationSeconds, exerciseCount: 4 };
 };
 
+/** Test helper: a flat Mon–Sun goal array as a `getSessionGoal(date)` callback, ignoring history. */
+const flatGoal = (sessionsPerDay: number[]) => (date: Date) => sessionsPerDay[(date.getDay() + 6) % 7];
+
 describe('getWeekDays', () => {
   it('returns 2*radius+1 days centered on today with correct letters', () => {
     const wednesday = new Date(2026, 7, 5); // Wednesday
@@ -57,8 +60,7 @@ describe('getWeekDays', () => {
   it('flags a past, event-less day as missedGoal only when that weekday has a nonzero goal', () => {
     const today = new Date(2026, 7, 5); // Wednesday
     // Mon..Sun: Monday has a goal of 1, every other day is 0.
-    const sessionsPerDay = [1, 0, 0, 0, 0, 0, 0];
-    const days = getWeekDays(today, new Map(), 3, today, sessionsPerDay);
+    const days = getWeekDays(today, new Map(), 3, today, flatGoal([1, 0, 0, 0, 0, 0, 0]));
     const monday = days.find((d) => d.letter === 'Pn');
     const tuesday = days.find((d) => d.letter === 'Wt');
     expect(monday?.missedGoal).toBe(true);
@@ -67,9 +69,8 @@ describe('getWeekDays', () => {
 
   it('does not flag missedGoal for a day with a logged session, or for today/future days', () => {
     const today = new Date(2026, 7, 5); // Wednesday
-    const sessionsPerDay = [1, 1, 1, 1, 1, 1, 1];
     const events = new Map([['2026-08-03', [{ hour: 7, minute: 0, durationMinutes: 30, status: 'done' as const }]]]);
-    const days = getWeekDays(today, events, 3, today, sessionsPerDay);
+    const days = getWeekDays(today, events, 3, today, flatGoal([1, 1, 1, 1, 1, 1, 1]));
     const monday = days.find((d) => d.letter === 'Pn'); // has a logged session
     const wednesday = days.find((d) => d.letter === 'Śr'); // today
     const thursday = days.find((d) => d.letter === 'Cz'); // future
@@ -138,8 +139,7 @@ describe('getMonthCells', () => {
 
   it('flags a past non-done day as "missedGoal" only when its weekday has a nonzero goal', () => {
     const today = new Date(2026, 7, 5); // Wednesday; 2026-08-03 is Monday, 2026-08-04 is Tuesday
-    const sessionsPerDay = [1, 0, 0, 0, 0, 0, 0]; // Monday has a goal, every other day is 0
-    const cells = getMonthCells(today, new Set(), new Set(), today, sessionsPerDay);
+    const cells = getMonthCells(today, new Set(), new Set(), today, flatGoal([1, 0, 0, 0, 0, 0, 0]));
     const byDay = new Map(cells.filter((c) => c.day !== null).map((c) => [c.day, c.state]));
     expect(byDay.get(3)).toBe('missedGoal'); // Monday, no goal met
     expect(byDay.get(4)).toBe('missed'); // Tuesday, no goal at all
@@ -147,8 +147,7 @@ describe('getMonthCells', () => {
 
   it('does not mark a done day as missedGoal even when its weekday has a goal', () => {
     const today = new Date(2026, 7, 5);
-    const sessionsPerDay = [1, 0, 0, 0, 0, 0, 0];
-    const cells = getMonthCells(today, new Set([3]), new Set(), today, sessionsPerDay);
+    const cells = getMonthCells(today, new Set([3]), new Set(), today, flatGoal([1, 0, 0, 0, 0, 0, 0]));
     const byDay = new Map(cells.filter((c) => c.day !== null).map((c) => [c.day, c.state]));
     expect(byDay.get(3)).toBe('done');
   });

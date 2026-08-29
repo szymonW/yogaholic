@@ -8,8 +8,10 @@ import { goBack } from '@/utils/navigation';
 const DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
 
 export default function GoalsScreen() {
-  const { sessionsPerDay, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
+  const { goalHistory, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
   const entries = useHistoryStore((state) => state.entries);
+  // The screen only ever edits the current (latest) snapshot — a change never rewrites the past.
+  const sessionsPerDay = goalHistory[goalHistory.length - 1].sessionsPerDay;
 
   const today = new Date();
   const { minutes: minutesDone } = summarizeWeek(entries, today);
