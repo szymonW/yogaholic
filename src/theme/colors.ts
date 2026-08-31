@@ -22,7 +22,7 @@ export const colors = {
 
   ringTrack: '#e9d7c9', // oklch(0.89 0.028 60)
   ringInner: '#eddaca', // oklch(0.9 0.03 62)
-  calendarDoneBg: '#ddb049', // oklch(0.78 0.13 85), used at 28% opacity in the mockup
+  calendarDoneBg: '#5f9463', // sage green — "done" marker, used at partial opacity in the calendar
 } as const;
 
 export type ColorToken = keyof typeof colors;

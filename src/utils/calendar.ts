@@ -27,27 +27,40 @@ export interface WeekDayInfo {
   dayNumber: number;
   isToday: boolean;
   events: DayEvent[];
+  /** Past day with a session goal (see `getSessionGoal`) that wasn't met. */
+  missedGoal: boolean;
 }
 
 /**
  * `anchor` ± `radius` days, mirroring the mockup's 7-day week strip. `today` (defaults to
  * `anchor`) is the real current date, used only to flag which day (if any) is "today" — pass
  * it explicitly when `anchor` has been moved to a past week so an arbitrary day in that window
- * doesn't get mislabeled as today.
+ * doesn't get mislabeled as today. `getSessionGoal` (from the goals screen) returns the session
+ * goal that was in effect *on that specific date* — a later goal change must never retroactively
+ * relabel an earlier day — and flags a past, event-less day as a missed goal only when it's nonzero.
  */
-export function getWeekDays(anchor: Date, eventsByISODate: Map<string, DayEvent[]>, radius = 3, today: Date = anchor): WeekDayInfo[] {
+export function getWeekDays(
+  anchor: Date,
+  eventsByISODate: Map<string, DayEvent[]>,
+  radius = 3,
+  today: Date = anchor,
+  getSessionGoal: (date: Date) => number = () => 0
+): WeekDayInfo[] {
   const todayISO = toISODate(today);
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
   const days: WeekDayInfo[] = [];
   for (let offset = -radius; offset <= radius; offset++) {
     const date = addDays(anchor, offset);
     const iso = toISODate(date);
+    const events = eventsByISODate.get(iso) ?? [];
     days.push({
       date,
       iso,
       letter: WEEKDAY_LETTERS_PL[(date.getDay() + 6) % 7],
       dayNumber: date.getDate(),
       isToday: iso === todayISO,
-      events: eventsByISODate.get(iso) ?? [],
+      events,
+      missedGoal: date.getTime() < startOfToday && events.length === 0 && getSessionGoal(date) > 0,
     });
   }
   return days;
@@ -58,7 +71,7 @@ export function formatShortDate(date: Date): string {
   return `${date.getDate()} ${MONTH_NAMES_SHORT_PL[date.getMonth()]}`;
 }
 
-export type MonthCellState = 'empty' | 'today' | 'todayDone' | 'done' | 'missed' | 'planned' | 'rest';
+export type MonthCellState = 'empty' | 'today' | 'todayDone' | 'done' | 'missed' | 'missedGoal' | 'planned' | 'rest';
 
 export interface MonthCell {
   day: number | null;
@@ -73,12 +86,17 @@ export function getMonthLabel(today: Date): string {
  * Renders `viewedMonth`'s grid. `today` (defaults to `viewedMonth`) is the real current date —
  * pass it explicitly once `viewedMonth` has been navigated away from the current month, so
  * "today"/past/future is judged against the real date rather than the viewed month's own days.
+ * `getSessionGoal` (from the goals screen) returns the session goal that was in effect *on that
+ * specific date* — a later goal change must never retroactively relabel an earlier day. A past,
+ * non-done day reads as plain "missed" (unmarked) when that goal was 0, or "missedGoal" (flagged)
+ * when it wasn't.
  */
 export function getMonthCells(
   viewedMonth: Date,
   doneDays: Set<number>,
   plannedDays: Set<number>,
-  today: Date = viewedMonth
+  today: Date = viewedMonth,
+  getSessionGoal: (date: Date) => number = () => 0
 ): MonthCell[] {
   const year = viewedMonth.getFullYear();
   const month = viewedMonth.getMonth();
@@ -92,9 +110,12 @@ export function getMonthCells(
   for (let i = 0; i < startOffset; i++) cells.push({ day: null, state: 'empty' });
   for (let day = 1; day <= daysInMonth; day++) {
     let state: MonthCellState;
+    const date = new Date(year, month, day);
     if (day === todayDay) state = doneDays.has(day) ? 'todayDone' : 'today';
-    else if (new Date(year, month, day).getTime() < startOfToday) state = doneDays.has(day) ? 'done' : 'missed';
-    else state = plannedDays.has(day) ? 'planned' : 'rest';
+    else if (date.getTime() < startOfToday) {
+      if (doneDays.has(day)) state = 'done';
+      else state = getSessionGoal(date) > 0 ? 'missedGoal' : 'missed';
+    } else state = plannedDays.has(day) ? 'planned' : 'rest';
     cells.push({ day, state });
   }
   return cells;
