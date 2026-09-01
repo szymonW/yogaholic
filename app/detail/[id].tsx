@@ -100,6 +100,5 @@ const styles = StyleSheet.create({
   footer: {
     padding: spacing.xl,
     paddingBottom: spacing.xxl,
-    backgroundColor: colors.background,
   },
 });

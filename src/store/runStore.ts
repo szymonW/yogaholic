@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import { EXERCISE_POOL } from '@/data/exercisePool';
 import type { Exercise, RunPhase, Sequence } from '@/types';
+import { useExercisePoolStore } from './exercisePoolStore';
 
 interface RunState {
   sequenceId: string | null;
@@ -23,6 +25,16 @@ interface RunState {
   reset: () => void;
 }
 
+/** Sequence exercises only carry a name + duration; fill in the bundled/custom pool's image by name. */
+function withPoolImages(exercises: Exercise[]): Exercise[] {
+  const pool = [...EXERCISE_POOL, ...useExercisePoolStore.getState().customExercises];
+  return exercises.map((exercise) => {
+    if (exercise.imageUri) return exercise;
+    const imageUri = pool.find((candidate) => candidate.name === exercise.name)?.imageUri;
+    return imageUri ? { ...exercise, imageUri } : exercise;
+  });
+}
+
 const IDLE: Omit<RunState, 'start' | 'tick' | 'togglePause' | 'skip' | 'previous' | 'reset'> = {
   sequenceId: null,
   exercises: [],
@@ -42,7 +54,7 @@ export const useRunStore = create<RunState>()((set, get) => ({
     const now = Date.now();
     set({
       sequenceId: sequence.id,
-      exercises: sequence.exercises,
+      exercises: withPoolImages(sequence.exercises),
       prepSeconds,
       runIndex: 0,
       phase: sequence.exercises.length > 0 ? 'prep' : 'complete',

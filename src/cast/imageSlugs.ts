@@ -8,9 +8,11 @@
 export const EXERCISE_IMAGE_SLUGS: Record<string, string> = {
   'Pozycja góry (Tadasana)': 'tadasana',
   'Pies z głową w dół (Adho Mukha Svanasana)': 'dog',
-  'Wojownik I (Virabhadrasana I)': 'warrior-1',
+  'Wojownik I Prawa (Virabhadrasana I)': 'warrior-1',
+  'Wojownik I Lewa (Virabhadrasana I)': 'warrior-1-left',
   'Dziecko (Balasana)': 'balasana',
-  'Skrętoskłon leżący (Supta Matsyendrasana)': 'supta-matsyendrasana',
+  'Skrętoskłon leżący Prawa (Supta Matsyendrasana)': 'supta-matsyendrasana',
+  'Skrętoskłon leżący Lewa (Supta Matsyendrasana)': 'supta-matsyendrasana-left',
   'Przysiad jogina (Malasana)': 'malasana',
   'Siad skrzyżny (Sukhasana)': 'siad-skrzyzny',
   'Pozycja kota i krowy (Marjaryasana-Bitilasana)': 'cat-cow',
