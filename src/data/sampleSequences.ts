@@ -37,6 +37,28 @@ export const BASE_SEQUENCES: Sequence[] = [
       { name: 'Skrętoskłon leżący Prawa (Supta Matsyendrasana)', duration: 45 },
     ],
   },
+  {
+    id: 's5',
+    title: 'Sekwencja wojownika',
+    tags: ['sample'],
+    exercises: [
+      { name: 'Wojownik I Prawa (Virabhadrasana I)', duration: 40 },
+      { name: 'Wojownik I Lewa (Virabhadrasana I)', duration: 40 },
+      { name: 'Pozycja wojownika II Prawa (Virabhadrasana II)', duration: 40 },
+      { name: 'Pozycja wojownika II Lewa (Virabhadrasana II)', duration: 40 },
+      { name: 'Odwrócony wojownik Lewa (Viparita Virabhadrasana)', duration: 20 },
+      { name: 'Odwrócony wojownik Prawa (Viparita Virabhadrasana)', duration: 20 },
+      { name: 'Wydłużony kąt boczny Lewa (Utthita Parsvakonasana)', duration: 20 },
+      { name: 'Wydłużony kąt boczny Prawa (Utthita Parsvakonasana)', duration: 20 },
+      { name: 'Pozycja wojownika III Lewa (Virabhadrasana III)', duration: 20 },
+      { name: 'Pozycja wojownika III Prawa (Virabhadrasana III)', duration: 20 },
+      { name: 'Pozycja półksiężyca Lewa (Ardha Chandrasana)', duration: 20 },
+      { name: 'Pozycja półksiężyca Prawa (Ardha Chandrasana)', duration: 20 },
+      { name: 'Pozycja boginii (Utkata Konasana)', duration: 45 },
+      { name: 'Skłon w rozkroku (Prasarita Padottanasana)', duration: 30 },
+      { name: 'Pozycja góry (Tadasana)', duration: 20 },
+    ],
+  },
 ];
 
 // Starter content for the user's "custom" category (ported from const CUSTOM_SEEDS).
