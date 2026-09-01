@@ -12,6 +12,8 @@ export const EXERCISE_POOL: Exercise[] = [
     imageUri: require('../../assets/exercises/Wojownik I Lewa (Virabhadrasana I).png'),
   },
   { name: 'Dziecko (Balasana)', duration: 60, imageUri: require("../../assets/exercises/Child's Pose (Balasana).png") },
+  { name: 'Deska (Phalakasana)', duration: 30, imageUri: require('../../assets/exercises/Deska (Phalakasana).png') },
+  { name: 'Półskłon (Ardha Uttanasana)', duration: 20, imageUri: require('../../assets/exercises/Półskłon (Ardha Uttanasana).png') },
   { name: 'Drzewo Prawa (Vrksasana)', duration: 30, imageUri: require('../../assets/exercises/Tree Pose (Vrksasana).png') },
   { name: 'Drzewo Lewa (Vrksasana)', duration: 30, imageUri: require('../../assets/exercises/Drzewo Lewa (Vrksasana).png') },
   {
