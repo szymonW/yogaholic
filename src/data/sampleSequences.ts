@@ -10,7 +10,7 @@ export const BASE_SEQUENCES: Sequence[] = [
     exercises: [
       { name: 'Pozycja góry (Tadasana)', duration: 30 },
       { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45 },
-      { name: 'Wojownik I (Virabhadrasana I)', duration: 40 },
+      { name: 'Wojownik I Prawa (Virabhadrasana I)', duration: 40 },
       { name: 'Trójkąt (Trikonasana)', duration: 40 },
       { name: 'Dziecko (Balasana)', duration: 60 },
     ],
@@ -47,7 +47,7 @@ export const CUSTOM_SEEDS: Sequence[] = [
     title: 'Moja sekwencja poranna',
     exercises: [
       { name: 'Pozycja góry (Tadasana)', duration: 30 },
-      { name: 'Wojownik I (Virabhadrasana I)', duration: 40 },
+      { name: 'Wojownik I Prawa (Virabhadrasana I)', duration: 40 },
       { name: 'Pozycja krzesła (Utkatasana)', duration: 35 },
       { name: 'Dziecko (Balasana)', duration: 60 },
     ],

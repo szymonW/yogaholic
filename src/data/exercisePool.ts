@@ -5,7 +5,12 @@ import type { Exercise } from '@/types';
 export const EXERCISE_POOL: Exercise[] = [
   { name: 'Pozycja góry (Tadasana)', duration: 30, imageUri: require('../../assets/exercises/Mountain Pose (Tadasana).png') },
   { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45, imageUri: require('../../assets/exercises/dog.png') },
-  { name: 'Wojownik I (Virabhadrasana I)', duration: 40, imageUri: require('../../assets/exercises/Warrior I (Virabhadrasana I).png') },
+  { name: 'Wojownik I Prawa (Virabhadrasana I)', duration: 40, imageUri: require('../../assets/exercises/Warrior I (Virabhadrasana I).png') },
+  {
+    name: 'Wojownik I Lewy (Virabhadrasana I)',
+    duration: 40,
+    imageUri: require('../../assets/exercises/Wojownik I Lewy (Virabhadrasana I).png'),
+  },
   { name: 'Dziecko (Balasana)', duration: 60, imageUri: require("../../assets/exercises/Child's Pose (Balasana).png") },
   { name: 'Drzewo (Vrksasana)', duration: 30, imageUri: require('../../assets/exercises/Tree Pose (Vrksasana).png') },
   {
