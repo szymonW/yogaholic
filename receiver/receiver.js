@@ -15,6 +15,7 @@
     'warrior-1-left': 'assets/warrior-1-left.png',
     balasana: 'assets/balasana.png',
     'supta-matsyendrasana': 'assets/supta-matsyendrasana.png',
+    'supta-matsyendrasana-left': 'assets/supta-matsyendrasana-left.png',
     malasana: 'assets/malasana.png',
     'siad-skrzyzny': 'assets/siad-skrzyzny.png',
     'cat-cow': 'assets/cat-cow.png',

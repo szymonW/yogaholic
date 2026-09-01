@@ -14,9 +14,14 @@ export const EXERCISE_POOL: Exercise[] = [
   { name: 'Dziecko (Balasana)', duration: 60, imageUri: require("../../assets/exercises/Child's Pose (Balasana).png") },
   { name: 'Drzewo (Vrksasana)', duration: 30, imageUri: require('../../assets/exercises/Tree Pose (Vrksasana).png') },
   {
-    name: 'Skrętoskłon leżący (Supta Matsyendrasana)',
+    name: 'Skrętoskłon leżący Prawa (Supta Matsyendrasana)',
     duration: 45,
     imageUri: require('../../assets/exercises/skretosklon lezacy (supta matsyendrasana).png'),
+  },
+  {
+    name: 'Skrętoskłon leżący Lewa (Supta Matsyendrasana)',
+    duration: 45,
+    imageUri: require('../../assets/exercises/Skrętoskłon leżący Lewa (Supta Matsyendrasana).png'),
   },
   { name: 'Przysiad jogina (Malasana)', duration: 40, imageUri: require('../../assets/exercises/Malasana.png') },
   { name: 'Siad skrzyżny (Sukhasana)', duration: 60, imageUri: require('../../assets/exercises/siad_skrzyzny.png') },

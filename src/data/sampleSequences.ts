@@ -21,7 +21,7 @@ export const BASE_SEQUENCES: Sequence[] = [
     tags: ['saved'],
     exercises: [
       { name: 'Pozycja kota i krowy (Marjaryasana-Bitilasana)', duration: 40 },
-      { name: 'Skrętoskłon leżący (Supta Matsyendrasana)', duration: 45 },
+      { name: 'Skrętoskłon leżący Prawa (Supta Matsyendrasana)', duration: 45 },
       { name: 'Pół-mostek (Ardha Setu Bandhasana)', duration: 35 },
       { name: 'Pozycja trupa (Savasana)', duration: 90 },
     ],
@@ -34,7 +34,7 @@ export const BASE_SEQUENCES: Sequence[] = [
       { name: 'Pozycja kota i krowy (Marjaryasana-Bitilasana)', duration: 40 },
       { name: 'Kobra (Bhujangasana)', duration: 30 },
       { name: 'Łuk (Dhanurasana)', duration: 30 },
-      { name: 'Skrętoskłon leżący (Supta Matsyendrasana)', duration: 45 },
+      { name: 'Skrętoskłon leżący Prawa (Supta Matsyendrasana)', duration: 45 },
     ],
   },
 ];
