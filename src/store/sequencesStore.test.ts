@@ -10,7 +10,7 @@ describe('selectSequencesForCategory', () => {
 
   it('returns sample-tagged base sequences for "sample"', () => {
     const result = selectSequencesForCategory('sample', state);
-    expect(result.map((s) => s.id)).toEqual(['s5', 's6']);
+    expect(result.map((s) => s.id)).toEqual(['s5', 's6', 's7']);
   });
 
   it('returns saved-tagged base sequences for "saved"', () => {
