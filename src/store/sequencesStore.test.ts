@@ -6,11 +6,11 @@ beforeEach(() => {
 });
 
 describe('selectSequencesForCategory', () => {
-  const state = { customSequences: CUSTOM_SEEDS, recentIds: ['s2', 's1', 'c1'] };
+  const state = { customSequences: CUSTOM_SEEDS, recentIds: ['s3', 's1', 'c1'] };
 
   it('returns sample-tagged base sequences for "sample"', () => {
     const result = selectSequencesForCategory('sample', state);
-    expect(result.map((s) => s.id).sort()).toEqual(['s1', 's2', 's3', 's4'].sort());
+    expect(result).toEqual([]);
   });
 
   it('returns saved-tagged base sequences for "saved"', () => {
@@ -24,7 +24,7 @@ describe('selectSequencesForCategory', () => {
 
   it('resolves recent ids to sequences, preserving order, across base and custom', () => {
     const result = selectSequencesForCategory('recent', state);
-    expect(result.map((s) => s.id)).toEqual(['s2', 's1', 'c1']);
+    expect(result.map((s) => s.id)).toEqual(['s3', 's1', 'c1']);
   });
 
   it('silently drops unknown recent ids', () => {

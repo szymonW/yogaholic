@@ -6,7 +6,7 @@ export const BASE_SEQUENCES: Sequence[] = [
   {
     id: 's1',
     title: 'Poranne przebudzenie',
-    tags: ['sample', 'saved'],
+    tags: ['saved'],
     exercises: [
       { name: 'Pozycja góry (Tadasana)', duration: 30 },
       { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45 },
@@ -16,37 +16,14 @@ export const BASE_SEQUENCES: Sequence[] = [
     ],
   },
   {
-    id: 's2',
-    title: 'Energia w 10 minut',
-    tags: ['sample'],
-    exercises: [
-      { name: 'Deska (Phalakasana)', duration: 30 },
-      { name: 'Kobra (Bhujangasana)', duration: 30 },
-      { name: 'Wojownik I (Virabhadrasana I)', duration: 40 },
-      { name: 'Wojownik II (Virabhadrasana II)', duration: 40 },
-      { name: 'Pozycja krzesła (Utkatasana)', duration: 35 },
-    ],
-  },
-  {
     id: 's3',
     title: 'Wieczorne rozciąganie',
-    tags: ['sample', 'saved'],
+    tags: ['saved'],
     exercises: [
       { name: 'Pozycja kota i krowy (Marjaryasana-Bitilasana)', duration: 40 },
       { name: 'Skrętoskłon leżący (Supta Matsyendrasana)', duration: 45 },
       { name: 'Pół-mostek (Ardha Setu Bandhasana)', duration: 35 },
       { name: 'Pozycja trupa (Savasana)', duration: 90 },
-    ],
-  },
-  {
-    id: 's4',
-    title: 'Równowaga i skupienie',
-    tags: ['sample'],
-    exercises: [
-      { name: 'Drzewo (Vrksasana)', duration: 30 },
-      { name: 'Pozycja orła (Garudasana)', duration: 35 },
-      { name: 'Wojownik I (Virabhadrasana I)', duration: 40 },
-      { name: 'Wojownik II (Virabhadrasana II)', duration: 40 },
     ],
   },
   {
