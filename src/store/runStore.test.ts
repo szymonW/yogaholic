@@ -38,6 +38,32 @@ describe('start', () => {
     useRunStore.getState().start({ id: 'empty', title: 'Empty', exercises: [] }, 3);
     expect(useRunStore.getState().phase).toBe('complete');
   });
+
+  it('fills in the bundled pool image for exercises that only carry a name', () => {
+    useRunStore.getState().start(
+      { id: 's', title: 'S', exercises: [{ name: 'Pozycja góry (Tadasana)', duration: 10 }] },
+      3
+    );
+    expect(useRunStore.getState().exercises[0].imageUri).toBeDefined();
+  });
+
+  it('leaves imageUri untouched when the exercise already has one, and undefined when no pool match exists', () => {
+    const customImage = { uri: 'file:///custom.png' };
+    useRunStore.getState().start(
+      {
+        id: 's',
+        title: 'S',
+        exercises: [
+          { name: 'Ma już zdjęcie', duration: 10, imageUri: customImage },
+          { name: 'Nie ma w puli', duration: 10 },
+        ],
+      },
+      3
+    );
+    const state = useRunStore.getState();
+    expect(state.exercises[0].imageUri).toBe(customImage);
+    expect(state.exercises[1].imageUri).toBeUndefined();
+  });
 });
 
 describe('tick', () => {
