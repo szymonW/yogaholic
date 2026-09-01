@@ -83,4 +83,9 @@ export const EXERCISE_POOL: Exercise[] = [
     duration: 40,
     imageUri: require('../../assets/exercises/Wydłużony kąt boczny (Utthita Parsvakonasana).png'),
   },
+  {
+    name: 'Odwrócony wojownik (Viparita Virabhadrasana)',
+    duration: 35,
+    imageUri: require('../../assets/exercises/Reverse Warrior (Viparita Virabhadrasana).png'),
+  },
 ];
