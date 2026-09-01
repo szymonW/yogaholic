@@ -112,7 +112,16 @@ export const EXERCISE_POOL: Exercise[] = [
     duration: 30,
     imageUri: require('../../assets/exercises/Pozycja wojownika III Lewa (Virabhadrasana III).png'),
   },
-  { name: 'Rozciąganie szyi', duration: 30, imageUri: require('../../assets/exercises/Rozciaganie szyi.png') },
+  {
+    name: 'Rozciąganie szyi w prawo w pozycji diamentu (Vajrasana)',
+    duration: 30,
+    imageUri: require('../../assets/exercises/Rozciaganie szyi.png'),
+  },
+  {
+    name: 'Rozciąganie szyi w lewo w pozycji diamentu (Vajrasana)',
+    duration: 30,
+    imageUri: require('../../assets/exercises/Rozciąganie szyi w lewo w pozycji diamentu (Vajrasana).png'),
+  },
   {
     name: 'Skłon w rozkroku (Prasarita Padottanasana)',
     duration: 40,
