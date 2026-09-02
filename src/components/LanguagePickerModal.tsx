@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     minWidth: 0,
     fontSize: 16,
+    fontWeight: '400',
     color: colors.textPrimary,
   },
   rowLabelDisabled: {
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
   rowBadge: {
     flexShrink: 0,
     fontSize: 13,
+    fontWeight: '400',
     color: colors.textFaint,
   },
 });

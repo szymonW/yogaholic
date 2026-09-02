@@ -116,11 +116,13 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     minWidth: 0,
     fontSize: 16,
+    fontWeight: '400',
     color: colors.textPrimary,
   },
   rowValue: {
     flexShrink: 0,
     fontSize: 15,
+    fontWeight: '400',
     color: colors.textSecondary,
   },
 });
