@@ -102,7 +102,9 @@ export default function CalendarScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.section, styles.monthSection]}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>{getMonthLabel(monthAnchor, t.calendar.monthNames)}</Text>
+            <Text style={styles.sectionLabel} numberOfLines={1} adjustsFontSizeToFit>
+              {getMonthLabel(monthAnchor, t.calendar.monthNames)}
+            </Text>
             <View style={styles.navButtons}>
               <IconButton accessibilityLabel={t.calendar.prevMonthA11y} size={28} onPress={() => setMonthOffset((v) => v - 1)}>
                 <ChevronLeftIcon size={14} />
@@ -167,7 +169,9 @@ export default function CalendarScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>{weekLabel}</Text>
+            <Text style={styles.sectionLabel} numberOfLines={1} adjustsFontSizeToFit>
+              {weekLabel}
+            </Text>
             <View style={styles.navButtons}>
               <IconButton accessibilityLabel={t.calendar.prevWeekA11y} size={28} onPress={() => setWeekOffset((v) => v - 1)}>
                 <ChevronLeftIcon size={14} />
@@ -248,6 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   sectionLabel: {
+    flexShrink: 1,
     fontSize: 13,
     color: colors.textSecondary,
     textTransform: 'uppercase',
