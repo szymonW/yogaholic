@@ -2,6 +2,9 @@
 // ("Aplikacja mobilna do ćwiczeń jogi" — Yoga App.dc.html). React Native does not
 // render oklch() in StyleSheet, so each token was converted once (Björn Ottosson's
 // OKLab formulas) and is kept here with its source value for traceability.
+// Shared by the calendar's "done" marker and the picker's "selected" check — one green, two uses.
+const sageGreen = '#5f9463';
+
 export const colors = {
   background: '#fbf4eb', // oklch(0.97 0.014 75)
   surface: '#f4e5d7', // oklch(0.93 0.025 65)
@@ -22,7 +25,9 @@ export const colors = {
 
   ringTrack: '#e9d7c9', // oklch(0.89 0.028 60)
   ringInner: '#eddaca', // oklch(0.9 0.03 62)
-  calendarDoneBg: '#5f9463', // sage green — "done" marker, used at partial opacity in the calendar
+
+  success: sageGreen, // confirmation marks drawn at full strength, e.g. the selected language
+  calendarDoneBg: sageGreen, // "done" marker, used at partial opacity in the calendar
 } as const;
 
 export type ColorToken = keyof typeof colors;

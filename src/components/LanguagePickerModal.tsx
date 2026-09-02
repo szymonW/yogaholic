@@ -41,9 +41,11 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
                     pressed && option.available && styles.rowPressed,
                   ]}
                 >
-                  <Text style={[styles.rowLabel, !option.available && styles.rowLabelDisabled]}>{option.label}</Text>
+                  <Text style={[styles.rowLabel, !option.available && styles.rowLabelDisabled]} numberOfLines={1}>
+                    {option.label}
+                  </Text>
                   {isSelected ? (
-                    <CheckIcon size={22} strokeWidth={2} />
+                    <CheckIcon size={22} strokeWidth={2} color={colors.success} />
                   ) : !option.available ? (
                     <Text style={styles.rowBadge}>{t.languagePicker.comingSoon}</Text>
                   ) : null}
@@ -93,6 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.sm,
     paddingVertical: 14,
     paddingHorizontal: spacing.xs,
   },
@@ -103,7 +106,12 @@ const styles = StyleSheet.create({
   rowPressed: {
     opacity: 0.6,
   },
+  // The label owns the leftover width so it is the only thing that can ever give; the badge and
+  // the check keep their intrinsic size. Without this both children shrink together and each
+  // loses its last characters ("wkrótce" → "wkrótc") once the OS font scale grows the row.
   rowLabel: {
+    flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: colors.textPrimary,
   },
@@ -111,6 +119,7 @@ const styles = StyleSheet.create({
     color: colors.textFaint,
   },
   rowBadge: {
+    flexShrink: 0,
     fontSize: 13,
     color: colors.textFaint,
   },
