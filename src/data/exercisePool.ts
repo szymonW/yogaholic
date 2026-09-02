@@ -77,6 +77,28 @@ export const EXERCISE_POOL: Exercise[] = [
   { name: 'Pozycja krokodyla (Makarasana)', duration: 60, imageUri: require('../../assets/exercises/Pozycja krokodyla (Makarasana).png') },
   { name: 'Pozycja mostu (Setu Bandhasana)', duration: 40, imageUri: require('../../assets/exercises/Pozycja mostu (Setu Bandhasana).png') },
   {
+    name: 'Pozycja sfinksa (Salamba Bhujangasana)',
+    duration: 45,
+    imageUri: require('../../assets/exercises/Pozycja sfinksa (Salamba Bhujangasana).png'),
+  },
+  { name: 'Pozycja szarańczy (Salabhasana)', duration: 30, imageUri: require('../../assets/exercises/Pozycja szarańczy (Salabhasana).png') },
+  {
+    name: 'Kolana do klatki piersiowej (Apanasana)',
+    duration: 60,
+    imageUri: require('../../assets/exercises/Kolana do klatki piersiowej (Apanasana).png'),
+  },
+  { name: 'Pozycja szewca (Baddha Konasana)', duration: 60, imageUri: require('../../assets/exercises/Pozycja szewca (Baddha Konasana).png') },
+  {
+    name: 'Rozciąganie tylnej części nogi w leżeniu Prawa (Supta Padangusthasana)',
+    duration: 45,
+    imageUri: require('../../assets/exercises/Rozciąganie tylnej części nogi w leżeniu Prawa (Supta Padangusthasana).png'),
+  },
+  {
+    name: 'Rozciąganie tylnej części nogi w leżeniu Lewa (Supta Padangusthasana)',
+    duration: 45,
+    imageUri: require('../../assets/exercises/Rozciąganie tylnej części nogi w leżeniu Lewa (Supta Padangusthasana).png'),
+  },
+  {
     name: 'Pozycja półksiężyca Prawa (Ardha Chandrasana)',
     duration: 35,
     imageUri: require('../../assets/exercises/Pozycja półksiężyca (Ardha Chandrasana).png'),
