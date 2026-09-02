@@ -1,7 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { useSettingsStore } from '@/store';
 import { SequenceCard } from './SequenceCard';
 
 describe('SequenceCard', () => {
+  // The assertions below are on Polish copy, so pin the UI language instead of inheriting
+  // whatever detectInitialLanguage() makes of the test machine's device locale.
+  beforeEach(() => {
+    useSettingsStore.setState({ language: 'pl' });
+  });
+
   it('renders title, subtitle and calls onStart/onOpenDetail', async () => {
     const onStart = jest.fn();
     const onOpenDetail = jest.fn();

@@ -73,7 +73,7 @@ export default function CalendarScreen() {
   const weekLabel =
     weekOffset === 0
       ? t.calendar.thisWeek
-      : `${formatShortDate(weekDays[0].date, t.calendar.monthNamesShort)} – ${formatShortDate(weekDays[6].date, t.calendar.monthNamesShort)}`;
+      : `${formatShortDate(weekDays[0].date, t.calendar)} – ${formatShortDate(weekDays[6].date, t.calendar)}`;
 
   const doneDays = getDoneDaysInMonth(entries, monthAnchor);
   const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today, getSessionGoal);

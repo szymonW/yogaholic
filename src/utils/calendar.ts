@@ -48,9 +48,15 @@ export function getWeekDays(
   return days;
 }
 
-/** "5 sie" — a short day+month label for a week's date range. */
-export function formatShortDate(date: Date, monthNamesShort: readonly string[]): string {
-  return `${date.getDate()} ${monthNamesShort[date.getMonth()]}`;
+export interface ShortDateLabels {
+  monthNamesShort: readonly string[];
+  /** Day/month order is language-specific ("5 sie" in Polish, "Aug 5" in English). */
+  shortDate: (day: number, month: string) => string;
+}
+
+/** "5 sie" / "Aug 5" — a short day+month label for a week's date range. */
+export function formatShortDate(date: Date, labels: ShortDateLabels): string {
+  return labels.shortDate(date.getDate(), labels.monthNamesShort[date.getMonth()]);
 }
 
 export type MonthCellState = 'empty' | 'today' | 'todayDone' | 'done' | 'missed' | 'missedGoal' | 'planned' | 'rest';

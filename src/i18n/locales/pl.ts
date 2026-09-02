@@ -188,7 +188,7 @@ export const pl = {
     thisWeek: 'Ten tydzień',
     done: 'Wykonane',
     missedGoal: 'Nieosiągnięty cel',
-    weekdayLetters: ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as string[],
+    weekdayLetters: ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'],
     monthNames: [
       'Styczeń',
       'Luty',
@@ -202,8 +202,9 @@ export const pl = {
       'Październik',
       'Listopad',
       'Grudzień',
-    ] as string[],
-    monthNamesShort: ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'] as string[],
+    ],
+    monthNamesShort: ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'],
+    shortDate: (day: number, month: string) => `${day} ${month}`,
   },
   goals: {
     title: 'Cele',
@@ -245,6 +246,9 @@ export const pl = {
   },
   exercises: exerciseNames,
   sequences: sequenceTitles,
-} as const;
+};
 
+// Polish is the source catalog: every other locale is checked against its shape. Deliberately
+// not `as const` — that would pin each value to its own string literal and no translation
+// could ever satisfy the type.
 export type Translations = typeof pl;

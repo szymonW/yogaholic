@@ -1,3 +1,4 @@
+import { en } from '@/i18n/locales/en';
 import { pl } from '@/i18n/locales/pl';
 import type { DayEvent, HistoryEntry } from '@/types';
 import {
@@ -83,7 +84,11 @@ describe('getWeekDays', () => {
 
 describe('formatShortDate', () => {
   it('formats a day and abbreviated Polish month', () => {
-    expect(formatShortDate(new Date(2026, 7, 5), pl.calendar.monthNamesShort)).toBe('5 sie');
+    expect(formatShortDate(new Date(2026, 7, 5), pl.calendar)).toBe('5 sie');
+  });
+
+  it('follows each language\'s own day/month order', () => {
+    expect(formatShortDate(new Date(2026, 7, 5), en.calendar)).toBe('Aug 5');
   });
 });
 
