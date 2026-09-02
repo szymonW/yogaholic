@@ -15,12 +15,12 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
   const t = useTranslation();
   return (
     <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
-      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} accessibilityLabel={t.close} />
+      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} accessibilityLabel={t.common.close} />
       <View style={styles.centerWrap} pointerEvents="box-none">
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text style={[typography.bodyLg, styles.title]}>{t.languagePickerTitle}</Text>
-            <IconButton accessibilityLabel={t.close} onPress={onClose} size={32}>
+            <Text style={[typography.bodyLg, styles.title]}>{t.languagePicker.title}</Text>
+            <IconButton accessibilityLabel={t.common.close} onPress={onClose} size={32}>
               <CloseIcon />
             </IconButton>
           </View>
@@ -45,7 +45,7 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
                   {isSelected ? (
                     <CheckIcon size={22} strokeWidth={2} />
                   ) : !option.available ? (
-                    <Text style={styles.rowBadge}>{t.comingSoon}</Text>
+                    <Text style={styles.rowBadge}>{t.languagePicker.comingSoon}</Text>
                   ) : null}
                 </Pressable>
               );

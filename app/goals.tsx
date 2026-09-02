@@ -1,13 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ProgressBar, ScreenBackground, ScreenHeader } from '@/components';
+import { useTranslation } from '@/i18n';
 import { useGoalsStore, useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { computeStreak, summarizeWeek } from '@/utils/history';
 import { goBack } from '@/utils/navigation';
 
-const DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
-
 export default function GoalsScreen() {
+  const t = useTranslation();
   const { goalHistory, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
   const entries = useHistoryStore((state) => state.entries);
   // The screen only ever edits the current (latest) snapshot — a change never rewrites the past.
@@ -20,16 +20,16 @@ export default function GoalsScreen() {
 
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title="Cele" onBack={goBack} />
+      <ScreenHeader title={t.goals.title} onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardLabel}>Sesje w dniu</Text>
-            <Text style={styles.cardValue}>{goalSessionsTotal} / tyg.</Text>
+            <Text style={styles.cardLabel}>{t.goals.sessionsPerDay}</Text>
+            <Text style={styles.cardValue}>{t.goals.perWeek(goalSessionsTotal)}</Text>
           </View>
           <View style={styles.dayGrid}>
             <View style={styles.dayRow}>
-              {DAY_LABELS.map((label) => (
+              {t.calendar.weekdayLetters.map((label) => (
                 <Text key={label} style={styles.dayLabel}>
                   {label}
                 </Text>
@@ -61,7 +61,7 @@ export default function GoalsScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardLabel}>Minuty w tygodniu</Text>
+            <Text style={styles.cardLabel}>{t.goals.minutesPerWeek}</Text>
             <Text style={styles.cardValue}>
               {minutesDone} / {goalMinutes}
             </Text>
@@ -71,7 +71,7 @@ export default function GoalsScreen() {
             <Pressable onPress={decGoalMinutes} style={styles.stepButton}>
               <Text style={styles.stepLabel}>−</Text>
             </Pressable>
-            <Text style={styles.stepGoal}>cel: {goalMinutes}</Text>
+            <Text style={styles.stepGoal}>{t.goals.goalMinutes(goalMinutes)}</Text>
             <Pressable onPress={incGoalMinutes} style={styles.stepButton}>
               <Text style={styles.stepLabel}>+</Text>
             </Pressable>
@@ -79,8 +79,8 @@ export default function GoalsScreen() {
         </View>
 
         <View style={[styles.card, styles.streakCard]}>
-          <Text style={styles.cardLabel}>Aktualna seria</Text>
-          <Text style={styles.streakValue}>{streak} dni</Text>
+          <Text style={styles.cardLabel}>{t.goals.currentStreak}</Text>
+          <Text style={styles.streakValue}>{t.goals.streakDays(streak)}</Text>
         </View>
       </View>
     </ScreenBackground>

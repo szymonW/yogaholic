@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from '@/i18n';
 import { colors, spacing, typography } from '@/theme';
 import { ChevronLeftIcon } from './icons';
 import { IconButton } from './IconButton';
@@ -17,11 +18,12 @@ interface ScreenHeaderProps {
 
 export function ScreenHeader({ title, subtitle, onBack, size = 'h1', action }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
+  const t = useTranslation();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
       <View style={styles.headerRow}>
-        <IconButton onPress={onBack} accessibilityLabel="Wstecz">
+        <IconButton onPress={onBack} accessibilityLabel={t.screenHeader.backA11y}>
           <ChevronLeftIcon />
         </IconButton>
         <View style={styles.titleRow}>

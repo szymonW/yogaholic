@@ -66,17 +66,26 @@ export function getLastPracticedDate(entries: HistoryEntry[], sequenceId: string
     .at(-1);
 }
 
+export interface RelativeDaysLabels {
+  today: string;
+  yesterday: string;
+  daysAgo: (n: number) => string;
+  weekAgo: string;
+  weeksAgo: (n: number) => string;
+  monthAgo: string;
+}
+
 /**
- * Short Polish "time ago" label for the recent-sequences list, e.g. "wczoraj", "3 dni temu".
+ * Short "time ago" label for the recent-sequences list, e.g. "wczoraj", "3 dni temu" (`t.history`).
  * Diffs calendar dates (both sides normalized to local midnight), not raw elapsed milliseconds —
  * otherwise a session logged this afternoon reads as "1 day ago" once >12h has passed since midnight.
  */
-export function formatRelativeDays(dateISO: string, today: Date): string {
+export function formatRelativeDays(dateISO: string, today: Date, labels: RelativeDaysLabels): string {
   const days = Math.round((parseISODate(toISODate(today)).getTime() - parseISODate(dateISO).getTime()) / 86_400_000);
-  if (days <= 0) return 'dzisiaj';
-  if (days === 1) return 'wczoraj';
-  if (days < 7) return `${days} dni temu`;
-  if (days < 14) return 'tydzień temu';
-  if (days < 30) return `${Math.floor(days / 7)} tygodnie temu`;
-  return 'miesiąc temu';
+  if (days <= 0) return labels.today;
+  if (days === 1) return labels.yesterday;
+  if (days < 7) return labels.daysAgo(days);
+  if (days < 14) return labels.weekAgo;
+  if (days < 30) return labels.weeksAgo(Math.floor(days / 7));
+  return labels.monthAgo;
 }

@@ -1,3 +1,4 @@
+import { pl } from '@/i18n/locales/pl';
 import type { HistoryEntry } from '@/types';
 import {
   addDays,
@@ -115,23 +116,23 @@ describe('formatRelativeDays', () => {
   const today = new Date(2026, 7, 5);
 
   it('labels today and yesterday specially', () => {
-    expect(formatRelativeDays('2026-08-05', today)).toBe('dzisiaj');
-    expect(formatRelativeDays('2026-08-04', today)).toBe('wczoraj');
+    expect(formatRelativeDays('2026-08-05', today, pl.history)).toBe('dzisiaj');
+    expect(formatRelativeDays('2026-08-04', today, pl.history)).toBe('wczoraj');
   });
 
   it('counts days for the rest of the week', () => {
-    expect(formatRelativeDays('2026-08-02', today)).toBe('3 dni temu');
+    expect(formatRelativeDays('2026-08-02', today, pl.history)).toBe('3 dni temu');
   });
 
   it('still says "dzisiaj"/"wczoraj" late in the day, not a day early', () => {
     const lateAfternoon = new Date(2026, 7, 5, 18, 30); // same calendar day, well past the 12h midpoint
-    expect(formatRelativeDays('2026-08-05', lateAfternoon)).toBe('dzisiaj');
-    expect(formatRelativeDays('2026-08-04', lateAfternoon)).toBe('wczoraj');
+    expect(formatRelativeDays('2026-08-05', lateAfternoon, pl.history)).toBe('dzisiaj');
+    expect(formatRelativeDays('2026-08-04', lateAfternoon, pl.history)).toBe('wczoraj');
   });
 
   it('buckets into weeks and months beyond that', () => {
-    expect(formatRelativeDays('2026-07-27', today)).toBe('tydzień temu');
-    expect(formatRelativeDays('2026-07-20', today)).toBe('2 tygodnie temu');
-    expect(formatRelativeDays('2026-06-01', today)).toBe('miesiąc temu');
+    expect(formatRelativeDays('2026-07-27', today, pl.history)).toBe('tydzień temu');
+    expect(formatRelativeDays('2026-07-20', today, pl.history)).toBe('2 tygodnie temu');
+    expect(formatRelativeDays('2026-06-01', today, pl.history)).toBe('miesiąc temu');
   });
 });

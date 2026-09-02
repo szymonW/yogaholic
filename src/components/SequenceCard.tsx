@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
 import { BookmarkIcon, TrashIcon } from './icons';
 
@@ -29,6 +30,7 @@ export function SequenceCard({
   isFavorite,
   onToggleFavorite,
 }: SequenceCardProps) {
+  const t = useTranslation();
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
@@ -41,26 +43,26 @@ export function SequenceCard({
             onPress={onToggleFavorite}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel={isFavorite ? `Usuń ${title} z ulubionych` : `Dodaj ${title} do ulubionych`}
+            accessibilityLabel={isFavorite ? t.sequenceCard.removeFavoriteA11y(title) : t.sequenceCard.addFavoriteA11y(title)}
             style={({ pressed }) => [styles.favoriteButton, pressed && styles.pressed]}
           >
             <BookmarkIcon size={22} filled={isFavorite} color={isFavorite ? colors.accent : colors.textTertiary} />
           </Pressable>
         ) : null}
       </View>
-      {lastLabel ? <Text style={styles.lastLabel}>Ostatnio: {lastLabel}</Text> : null}
+      {lastLabel ? <Text style={styles.lastLabel}>{t.sequenceCard.lastPracticed(lastLabel)}</Text> : null}
       <View style={styles.actions}>
         <Pressable onPress={onStart} style={({ pressed }) => [styles.startButton, pressed && styles.pressed]}>
-          <Text style={styles.startLabel}>Start</Text>
+          <Text style={styles.startLabel}>{t.sequenceCard.start}</Text>
         </Pressable>
         <Pressable onPress={onOpenDetail} style={({ pressed }) => [styles.detailButton, pressed && styles.pressed]}>
-          <Text style={styles.detailLabel}>{isEditable ? 'Edytuj' : 'Szczegóły'}</Text>
+          <Text style={styles.detailLabel}>{isEditable ? t.sequenceCard.edit : t.sequenceCard.details}</Text>
         </Pressable>
         {onDelete ? (
           <Pressable
             onPress={onDelete}
             accessibilityRole="button"
-            accessibilityLabel={`Usuń ${title}`}
+            accessibilityLabel={t.sequenceCard.deleteA11y(title)}
             style={({ pressed }) => [styles.deleteButton, pressed && styles.pressed]}
           >
             <TrashIcon />

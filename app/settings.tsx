@@ -51,17 +51,21 @@ export default function SettingsScreen() {
 
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title={t.settingsTitle} onBack={goBack} />
+      <ScreenHeader title={t.settings.title} onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
-          <SettingsRow label={t.notifications} toggleValue={notificationsEnabled} onPress={toggleNotifications} />
-          <SettingsRow label={t.instructorVoice} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
-          <SettingsRow label={t.prepCountdown} value={t.prepCountdownValue(prepCountdownSeconds)} onPress={cyclePrepCountdown} />
-          <SettingsRow label={t.language} value={currentLanguageLabel} onPress={() => setLanguagePickerVisible(true)} isLast />
+          <SettingsRow label={t.settings.notifications} toggleValue={notificationsEnabled} onPress={toggleNotifications} />
+          <SettingsRow label={t.settings.instructorVoice} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
+          <SettingsRow
+            label={t.settings.prepCountdown}
+            value={t.settings.prepCountdownValue(prepCountdownSeconds)}
+            onPress={cyclePrepCountdown}
+          />
+          <SettingsRow label={t.settings.language} value={currentLanguageLabel} onPress={() => setLanguagePickerVisible(true)} isLast />
         </View>
 
         <View style={styles.card}>
-          <SettingsRow label={t.appVersion} value={Constants.expoConfig?.version ?? '1.0.0'} isLast />
+          <SettingsRow label={t.settings.appVersion} value={Constants.expoConfig?.version ?? '1.0.0'} isLast />
         </View>
       </View>
 

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, PanResponder, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, ScreenBackground, ScreenHeader, StepButton } from '@/components';
 import { DragHandleIcon } from '@/components/icons';
+import { useTranslation } from '@/i18n';
 import { selectAllExercises, useExercisePoolStore, useSequencesStore } from '@/store';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Exercise } from '@/types';
@@ -41,7 +42,9 @@ function SequenceItemRow({
   onDragEnd,
   onMeasureHeight,
 }: SequenceItemRowProps) {
+  const t = useTranslation();
   const { id, exercise } = editableItem;
+  const name = t.exercises[exercise.name] ?? exercise.name;
 
   // Created once per row instance (stable key = id) so an in-progress gesture
   // survives the row being reordered to a new index mid-drag.
@@ -61,14 +64,14 @@ function SequenceItemRow({
       style={[styles.itemRow, isDragging && styles.itemRowDragging, isDragging && { transform: [{ translateY: dragY }] }]}
       onLayout={(e) => onMeasureHeight(e.nativeEvent.layout.height)}
     >
-      <View {...panResponder.panHandlers} style={styles.dragHandle} accessibilityLabel={`Przesuń ${exercise.name}`}>
+      <View {...panResponder.panHandlers} style={styles.dragHandle} accessibilityLabel={t.create.moveA11y(name)}>
         <DragHandleIcon />
       </View>
-      <Text style={styles.itemName}>{exercise.name}</Text>
+      <Text style={styles.itemName}>{name}</Text>
       <StepButton label="−" onStep={() => onChangeDuration(id, -DURATION_STEP)} />
       <Text style={styles.itemTime}>{formatDuration(exercise.duration)}</Text>
       <StepButton label="+" onStep={() => onChangeDuration(id, DURATION_STEP)} />
-      <Pressable onPress={() => onRemove(id)} accessibilityLabel={`Usuń ${exercise.name}`} style={styles.removeButton}>
+      <Pressable onPress={() => onRemove(id)} accessibilityLabel={t.create.removeA11y(name)} style={styles.removeButton}>
         <Text style={styles.removeLabel}>×</Text>
       </Pressable>
     </Animated.View>
@@ -76,6 +79,7 @@ function SequenceItemRow({
 }
 
 export default function CreateSequenceScreen() {
+  const t = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const isEditing = Boolean(id);
 
@@ -183,9 +187,9 @@ export default function CreateSequenceScreen() {
   if (isEditing && !existingSequence) {
     return (
       <ScreenBackground style={styles.root}>
-        <ScreenHeader title="Edytuj sekwencję" size="h2" onBack={goBack} />
+        <ScreenHeader title={t.create.editTitle} size="h2" onBack={goBack} />
         <View style={styles.notFound}>
-          <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
+          <Text style={typography.body}>{t.create.notFound}</Text>
         </View>
       </ScreenBackground>
     );
@@ -194,25 +198,25 @@ export default function CreateSequenceScreen() {
   return (
     <ScreenBackground style={styles.root}>
       <ScreenHeader
-        title={`${isEditing ? 'Edytuj sekwencję' : 'Nowa sekwencja'} (${formatDurationPadded(totalSeconds)})`}
+        title={`${isEditing ? t.create.editTitle : t.create.newTitle} (${formatDurationPadded(totalSeconds)})`}
         size="h2"
         onBack={goBack}
       />
 
       <ScrollView contentContainerStyle={styles.content} scrollEnabled={draggingId === null}>
         <View style={styles.field}>
-          <Text style={styles.label}>Nazwa sekwencji</Text>
+          <Text style={styles.label}>{t.create.nameLabel}</Text>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="np. Poranna energia"
+            placeholder={t.create.namePlaceholder}
             placeholderTextColor={colors.textTertiary}
             style={styles.input}
           />
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Pozycje ({items.length})</Text>
+          <Text style={styles.label}>{t.create.positionsLabel(items.length)}</Text>
 
           {items.map((it) => (
             <SequenceItemRow
@@ -229,7 +233,7 @@ export default function CreateSequenceScreen() {
             />
           ))}
 
-          <Button title="+ Dodaj pozycję" variant="secondary" style={styles.dashed} onPress={() => setPickerOpen((v) => !v)} />
+          <Button title={t.create.addPosition} variant="secondary" style={styles.dashed} onPress={() => setPickerOpen((v) => !v)} />
 
           {pickerOpen ? (
             <ScrollView style={styles.picker} nestedScrollEnabled>
@@ -241,11 +245,9 @@ export default function CreateSequenceScreen() {
                     onPress={() => addFromPool(exercise)}
                     style={[styles.pickerRow, addedCount > 0 && styles.pickerRowAdded]}
                   >
-                    <Text style={styles.pickerName}>{exercise.name}</Text>
+                    <Text style={styles.pickerName}>{t.exercises[exercise.name] ?? exercise.name}</Text>
                     <View style={styles.pickerRight}>
-                      {addedCount > 0 ? (
-                        <Text style={styles.pickerAdded}>✓ dodano{addedCount > 1 ? ` ×${addedCount}` : ''}</Text>
-                      ) : null}
+                      {addedCount > 0 ? <Text style={styles.pickerAdded}>{t.create.addedBadge(addedCount)}</Text> : null}
                       <Text style={styles.pickerTime}>{formatDuration(exercise.duration)}</Text>
                     </View>
                   </Pressable>
@@ -257,7 +259,7 @@ export default function CreateSequenceScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title={isEditing ? 'Zapisz zmiany' : 'Zapisz sekwencję'} size="lg" disabled={!canSave} onPress={handleSave} />
+        <Button title={isEditing ? t.create.saveChanges : t.create.saveSequence} size="lg" disabled={!canSave} onPress={handleSave} />
       </View>
     </ScreenBackground>
   );

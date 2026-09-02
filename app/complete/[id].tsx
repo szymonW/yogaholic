@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, ScreenBackground } from '@/components';
 import { CheckIcon } from '@/components/icons';
+import { useTranslation } from '@/i18n';
 import { useRunStore } from '@/store/runStore';
 import { useSequencesStore } from '@/store/sequencesStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -10,6 +11,7 @@ import { goBack } from '@/utils/navigation';
 import { totalDuration } from '@/utils/time';
 
 export default function CompleteScreen() {
+  const t = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const sequence = useSequencesStore((state) => state.getById(id));
   const pushRecent = useSequencesStore((state) => state.pushRecent);
@@ -18,7 +20,7 @@ export default function CompleteScreen() {
   if (!sequence) {
     return (
       <ScreenBackground style={styles.root}>
-        <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
+        <Text style={typography.body}>{t.complete.notFound}</Text>
       </ScreenBackground>
     );
   }
@@ -39,23 +41,23 @@ export default function CompleteScreen() {
       <View style={styles.badge}>
         <CheckIcon />
       </View>
-      <Text style={styles.title}>Świetna robota!</Text>
-      <Text style={styles.subtitle}>Zakończyłeś sekwencję {sequence.title}</Text>
+      <Text style={styles.title}>{t.complete.title}</Text>
+      <Text style={styles.subtitle}>{t.complete.subtitle(t.sequences[sequence.id] ?? sequence.title)}</Text>
 
       <View style={styles.stats}>
         <View style={styles.stat}>
           <Text style={styles.statValue}>{sequence.exercises.length}</Text>
-          <Text style={styles.statLabel}>pozycji</Text>
+          <Text style={styles.statLabel}>{t.complete.positions}</Text>
         </View>
         <View style={styles.stat}>
           <Text style={styles.statValue}>{totalDuration(sequence.exercises)}</Text>
-          <Text style={styles.statLabel}>czasu</Text>
+          <Text style={styles.statLabel}>{t.complete.time}</Text>
         </View>
       </View>
 
       <View style={styles.actions}>
-        <Button title="Powtórz sekwencję" size="lg" onPress={handleRestart} />
-        <Button title="Wróć do listy" variant="secondary" size="lg" onPress={handleBackToList} />
+        <Button title={t.complete.repeat} size="lg" onPress={handleRestart} />
+        <Button title={t.complete.backToList} variant="secondary" size="lg" onPress={handleBackToList} />
       </View>
     </ScreenBackground>
   );

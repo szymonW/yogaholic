@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { IconButton, ScreenBackground, ScreenHeader } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
+import { useTranslation } from '@/i18n';
 import { getSessionGoalForDate, useGoalsStore, useHistoryStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { addDays } from '@/utils/history';
@@ -50,6 +51,7 @@ const MONTH_CELL_STYLES: Record<
 };
 
 export default function CalendarScreen() {
+  const t = useTranslation();
   const entries = useHistoryStore((state) => state.entries);
   const goalHistory = useGoalsStore((state) => state.goalHistory);
   const today = new Date();
@@ -65,10 +67,13 @@ export default function CalendarScreen() {
   const monthAnchor = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
 
   const eventsByDate = historyToDayEvents(entries);
-  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today, getSessionGoal);
+  const weekDays = getWeekDays(weekAnchor, eventsByDate, 3, today, getSessionGoal, t.calendar.weekdayLetters);
   const hourLabels = getHourLabels(HOUR_RANGE.start, HOUR_RANGE.end, ROW_HEIGHT);
   const gridHeight = (HOUR_RANGE.end - HOUR_RANGE.start) * ROW_HEIGHT;
-  const weekLabel = weekOffset === 0 ? 'Ten tydzień' : `${formatShortDate(weekDays[0].date)} – ${formatShortDate(weekDays[6].date)}`;
+  const weekLabel =
+    weekOffset === 0
+      ? t.calendar.thisWeek
+      : `${formatShortDate(weekDays[0].date, t.calendar.monthNamesShort)} – ${formatShortDate(weekDays[6].date, t.calendar.monthNamesShort)}`;
 
   const doneDays = getDoneDaysInMonth(entries, monthAnchor);
   const monthCells = getMonthCells(monthAnchor, doneDays, PLANNED_DAYS, today, getSessionGoal);
@@ -81,29 +86,29 @@ export default function CalendarScreen() {
   return (
     <ScreenBackground style={styles.root}>
       <ScreenHeader
-        title="Kalendarz"
+        title={t.calendar.title}
         onBack={goBack}
         action={
           <Pressable
             onPress={goToToday}
             accessibilityRole="button"
-            accessibilityLabel="Przejdź do dzisiaj"
+            accessibilityLabel={t.calendar.todayA11y}
             style={({ pressed }) => [styles.todayButton, pressed && styles.todayButtonPressed]}
           >
-            <Text style={styles.todayButtonLabel}>Dzisiaj</Text>
+            <Text style={styles.todayButtonLabel}>{t.calendar.today}</Text>
           </Pressable>
         }
       />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.section, styles.monthSection]}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionLabel}>{getMonthLabel(monthAnchor)}</Text>
+            <Text style={styles.sectionLabel}>{getMonthLabel(monthAnchor, t.calendar.monthNames)}</Text>
             <View style={styles.navButtons}>
-              <IconButton accessibilityLabel="Poprzedni miesiąc" size={28} onPress={() => setMonthOffset((v) => v - 1)}>
+              <IconButton accessibilityLabel={t.calendar.prevMonthA11y} size={28} onPress={() => setMonthOffset((v) => v - 1)}>
                 <ChevronLeftIcon size={14} />
               </IconButton>
               <IconButton
-                accessibilityLabel="Następny miesiąc"
+                accessibilityLabel={t.calendar.nextMonthA11y}
                 size={28}
                 disabled={monthOffset === 0}
                 onPress={() => setMonthOffset((v) => Math.min(0, v + 1))}
@@ -115,7 +120,7 @@ export default function CalendarScreen() {
             </View>
           </View>
           <View style={styles.monthHeaderRow}>
-            {['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'].map((label) => (
+            {t.calendar.weekdayLetters.map((label) => (
               <Text key={label} style={styles.monthHeaderLabel}>
                 {label}
               </Text>
@@ -150,11 +155,11 @@ export default function CalendarScreen() {
           <View style={styles.legend}>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: colors.calendarDoneBg + '48' }]} />
-              <Text style={styles.legendLabel}>Wykonane</Text>
+              <Text style={styles.legendLabel}>{t.calendar.done}</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: colors.danger + '48' }]} />
-              <Text style={styles.legendLabel}>Nieosiągnięty cel</Text>
+              <Text style={styles.legendLabel}>{t.calendar.missedGoal}</Text>
             </View>
             {/* "Zaplanowane" is left out until a real scheduling feature exists — see PLANNED_DAYS above. */}
           </View>
@@ -164,11 +169,11 @@ export default function CalendarScreen() {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionLabel}>{weekLabel}</Text>
             <View style={styles.navButtons}>
-              <IconButton accessibilityLabel="Poprzedni tydzień" size={28} onPress={() => setWeekOffset((v) => v - 1)}>
+              <IconButton accessibilityLabel={t.calendar.prevWeekA11y} size={28} onPress={() => setWeekOffset((v) => v - 1)}>
                 <ChevronLeftIcon size={14} />
               </IconButton>
               <IconButton
-                accessibilityLabel="Następny tydzień"
+                accessibilityLabel={t.calendar.nextWeekA11y}
                 size={28}
                 disabled={weekOffset === 0}
                 onPress={() => setWeekOffset((v) => Math.min(0, v + 1))}

@@ -10,6 +10,7 @@ import { IconButton, ProgressBar, RingTimer, ScreenBackground } from '@/componen
 import { CloseIcon, PauseIcon, PlayIcon, PreviousIcon, SkipIcon } from '@/components/icons';
 import { useCastRunChannel } from '@/hooks/useCastRunChannel';
 import { useRunTimer } from '@/hooks/useRunTimer';
+import { useTranslation } from '@/i18n';
 import { useHistoryStore, useSequencesStore, useSettingsStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
 import { splitExerciseName } from '@/utils/exercise';
@@ -19,6 +20,7 @@ import { formatDuration } from '@/utils/time';
 const PREP_BEEP_SOUND = require('../../assets/sounds/Beep Short .mp3');
 
 export default function RunScreen() {
+  const t = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const sequence = useSequencesStore((state) => state.getById(id));
@@ -87,12 +89,12 @@ export default function RunScreen() {
     return (
       <ScreenBackground style={styles.root}>
         <View style={[styles.topBar, { paddingTop: insets.top }]}>
-          <IconButton onPress={goBack} accessibilityLabel="Zamknij">
+          <IconButton onPress={goBack} accessibilityLabel={t.run.closeA11y}>
             <CloseIcon />
           </IconButton>
         </View>
         <View style={styles.center}>
-          <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
+          <Text style={typography.body}>{t.run.notFound}</Text>
         </View>
       </ScreenBackground>
     );
@@ -102,18 +104,19 @@ export default function RunScreen() {
     return <ScreenBackground style={styles.root} />;
   }
 
-  const { primary, original } = splitExerciseName(currentExercise.name);
+  const localizedName = t.exercises[currentExercise.name] ?? currentExercise.name;
+  const { primary, original } = splitExerciseName(localizedName);
   const isPrep = phase === 'prep';
 
   return (
     <ScreenBackground style={styles.root}>
       <View style={[styles.topBar, { paddingTop: insets.top }]}>
         <View style={styles.topBarRow}>
-          <IconButton onPress={goBack} accessibilityLabel="Zamknij">
+          <IconButton onPress={goBack} accessibilityLabel={t.run.closeA11y}>
             <CloseIcon size={14} />
           </IconButton>
           <Text style={styles.progressLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
-            Ćwiczenie {runIndex + 1} z {exercises.length}
+            {t.run.progress(runIndex + 1, exercises.length)}
           </Text>
           <CastButtonSafe style={styles.castButton} tintColor={colors.textPrimary} />
         </View>
@@ -128,7 +131,7 @@ export default function RunScreen() {
           {currentExercise.imageUri ? (
             <Image source={currentExercise.imageUri} style={styles.illustrationImage} resizeMode="cover" />
           ) : (
-            <Text style={styles.illustration}>ilustracja: {primary.toLowerCase()}</Text>
+            <Text style={styles.illustration}>{t.run.illustration(primary.toLowerCase())}</Text>
           )}
         </RingTimer>
         <Text style={styles.exerciseName} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
@@ -140,7 +143,7 @@ export default function RunScreen() {
           </Text>
         ) : null}
         <Text style={styles.phaseCaption} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
-          {isPrep ? 'Przygotuj się' : 'Pozostały czas'}
+          {isPrep ? t.run.getReady : t.run.timeRemaining}
         </Text>
         <Text style={styles.timeBig}>{isPrep ? String(remainingSeconds) : formatDuration(remainingSeconds)}</Text>
       </View>
@@ -149,7 +152,7 @@ export default function RunScreen() {
         <IconButton
           onPress={previous}
           disabled={!canGoPrevious}
-          accessibilityLabel="Poprzednie ćwiczenie"
+          accessibilityLabel={t.run.previousA11y}
           size={52}
           backgroundColor={colors.surfaceAlt}
           style={styles.skipButton}
@@ -158,14 +161,14 @@ export default function RunScreen() {
         </IconButton>
         <IconButton
           onPress={togglePause}
-          accessibilityLabel={paused ? 'Wznów' : 'Pauza'}
+          accessibilityLabel={paused ? t.run.resumeA11y : t.run.pauseA11y}
           size={78}
           backgroundColor={colors.accent}
           style={styles.playButton}
         >
           {paused ? <PlayIcon /> : <PauseIcon />}
         </IconButton>
-        <IconButton onPress={skip} accessibilityLabel="Pomiń" size={52} backgroundColor={colors.surfaceAlt} style={styles.skipButton}>
+        <IconButton onPress={skip} accessibilityLabel={t.run.skipA11y} size={52} backgroundColor={colors.surfaceAlt} style={styles.skipButton}>
           <SkipIcon />
         </IconButton>
       </View>
