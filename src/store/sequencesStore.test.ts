@@ -2,20 +2,25 @@ import { CUSTOM_SEEDS } from '@/data/sampleSequences';
 import { selectSequencesForCategory, useSequencesStore } from './sequencesStore';
 
 beforeEach(() => {
-  useSequencesStore.setState({ customSequences: CUSTOM_SEEDS, recentIds: [] });
+  useSequencesStore.setState({ customSequences: CUSTOM_SEEDS, recentIds: [], favoriteIds: [] });
 });
 
 describe('selectSequencesForCategory', () => {
-  const state = { customSequences: CUSTOM_SEEDS, recentIds: ['s3', 's1', 'c1'] };
+  const state = { customSequences: CUSTOM_SEEDS, recentIds: ['s3', 's1', 'c1'], favoriteIds: ['sv3', 's1', 'c1'] };
 
   it('returns sample-tagged base sequences for "sample"', () => {
     const result = selectSequencesForCategory('sample', state);
     expect(result.map((s) => s.id)).toEqual(['s5', 's6', 's7', 's8']);
   });
 
-  it('returns saved-tagged base sequences for "saved"', () => {
+  it('resolves favorite ids to sequences, preserving order, across base and custom for "saved"', () => {
     const result = selectSequencesForCategory('saved', state);
-    expect(result.map((s) => s.id).sort()).toEqual(['s1', 's3', 'sv3'].sort());
+    expect(result.map((s) => s.id)).toEqual(['sv3', 's1', 'c1']);
+  });
+
+  it('starts with an empty favorites list', () => {
+    const result = selectSequencesForCategory('saved', { ...state, favoriteIds: [] });
+    expect(result).toEqual([]);
   });
 
   it('returns custom sequences for "custom"', () => {
@@ -34,10 +39,11 @@ describe('selectSequencesForCategory', () => {
 });
 
 describe('useSequencesStore', () => {
-  it('starts seeded with CUSTOM_SEEDS and an empty recent list', () => {
+  it('starts seeded with CUSTOM_SEEDS and empty recent/favorite lists', () => {
     const state = useSequencesStore.getState();
     expect(state.customSequences).toEqual(CUSTOM_SEEDS);
     expect(state.recentIds).toEqual([]);
+    expect(state.favoriteIds).toEqual([]);
   });
 
   it('getById finds base and custom sequences', () => {
@@ -75,6 +81,18 @@ describe('useSequencesStore', () => {
     const ids = useSequencesStore.getState().customSequences.map((s) => s.id);
     expect(ids).not.toContain('c1');
     expect(ids).toContain('c2');
+  });
+
+  it('toggleFavorite adds an id, and toggling it again removes it', () => {
+    const { toggleFavorite } = useSequencesStore.getState();
+    toggleFavorite('s1');
+    expect(useSequencesStore.getState().favoriteIds).toEqual(['s1']);
+
+    toggleFavorite('c1');
+    expect(useSequencesStore.getState().favoriteIds).toEqual(['c1', 's1']);
+
+    toggleFavorite('s1');
+    expect(useSequencesStore.getState().favoriteIds).toEqual(['c1']);
   });
 
   it('pushRecent dedups, orders newest-first, and caps at 5', () => {

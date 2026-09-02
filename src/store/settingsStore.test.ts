@@ -1,7 +1,7 @@
 import { useSettingsStore } from './settingsStore';
 
 beforeEach(() => {
-  useSettingsStore.setState({ notificationsEnabled: true, instructorVoiceEnabled: true, prepCountdownSeconds: 3 });
+  useSettingsStore.setState({ notificationsEnabled: true, instructorVoiceEnabled: true, prepCountdownSeconds: 3, language: 'pl' });
 });
 
 describe('useSettingsStore', () => {
@@ -17,5 +17,10 @@ describe('useSettingsStore', () => {
   it('sets the prep countdown', () => {
     useSettingsStore.getState().setPrepCountdown(5);
     expect(useSettingsStore.getState().prepCountdownSeconds).toBe(5);
+  });
+
+  it('sets the language', () => {
+    useSettingsStore.getState().setLanguage('en');
+    expect(useSettingsStore.getState().language).toBe('en');
   });
 });

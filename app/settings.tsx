@@ -1,6 +1,8 @@
 import Constants from 'expo-constants';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ScreenBackground, ScreenHeader, Toggle } from '@/components';
+import { LanguagePickerModal, ScreenBackground, ScreenHeader, Toggle } from '@/components';
+import { LANGUAGE_OPTIONS, useTranslation } from '@/i18n';
 import { useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { goBack } from '@/utils/navigation';
@@ -34,8 +36,10 @@ function SettingsRow({ label, value, toggleValue, onPress, isLast }: SettingsRow
 }
 
 export default function SettingsScreen() {
-  const { notificationsEnabled, instructorVoiceEnabled, prepCountdownSeconds, toggleNotifications, toggleInstructorVoice, setPrepCountdown } =
+  const t = useTranslation();
+  const { notificationsEnabled, instructorVoiceEnabled, prepCountdownSeconds, language, toggleNotifications, toggleInstructorVoice, setPrepCountdown, setLanguage } =
     useSettingsStore();
+  const [languagePickerVisible, setLanguagePickerVisible] = useState(false);
 
   const cyclePrepCountdown = () => {
     const currentIndex = PREP_PRESETS_SECONDS.indexOf(prepCountdownSeconds);
@@ -43,20 +47,33 @@ export default function SettingsScreen() {
     setPrepCountdown(next);
   };
 
+  const currentLanguageLabel = LANGUAGE_OPTIONS.find((option) => option.code === language)?.label ?? language;
+
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title="Ustawienia" onBack={goBack} />
+      <ScreenHeader title={t.settingsTitle} onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
-          <SettingsRow label="Powiadomienia" toggleValue={notificationsEnabled} onPress={toggleNotifications} />
-          <SettingsRow label="Głos instruktora" toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
-          <SettingsRow label="Odliczanie przygotowania" value={`${prepCountdownSeconds} s`} onPress={cyclePrepCountdown} isLast />
+          <SettingsRow label={t.notifications} toggleValue={notificationsEnabled} onPress={toggleNotifications} />
+          <SettingsRow label={t.instructorVoice} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
+          <SettingsRow label={t.prepCountdown} value={t.prepCountdownValue(prepCountdownSeconds)} onPress={cyclePrepCountdown} />
+          <SettingsRow label={t.language} value={currentLanguageLabel} onPress={() => setLanguagePickerVisible(true)} isLast />
         </View>
 
         <View style={styles.card}>
-          <SettingsRow label="O aplikacji" value={Constants.expoConfig?.version ?? '1.0'} isLast />
+          <SettingsRow label={t.appVersion} value={Constants.expoConfig?.version ?? '1.0.0'} isLast />
         </View>
       </View>
+
+      <LanguagePickerModal
+        visible={languagePickerVisible}
+        selectedCode={language}
+        onSelect={(code) => {
+          setLanguage(code);
+          setLanguagePickerVisible(false);
+        }}
+        onClose={() => setLanguagePickerVisible(false)}
+      />
     </ScreenBackground>
   );
 }

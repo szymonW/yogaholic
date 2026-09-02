@@ -8,7 +8,7 @@ export interface Exercise {
   imageUri?: ImageSourcePropType;
 }
 
-export type SequenceTag = 'sample' | 'saved';
+export type SequenceTag = 'sample';
 
 export interface Sequence {
   id: string;

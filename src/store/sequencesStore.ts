@@ -9,11 +9,14 @@ interface SequencesState {
   customSequences: Sequence[];
   /** Most recently started sequence ids, newest first, capped at 5. Real usage only — not seeded. */
   recentIds: string[];
+  /** User-favorited sequence ids (base or custom), newest first. Not seeded. */
+  favoriteIds: string[];
   getById: (id: string) => Sequence | undefined;
   addCustomSequence: (input: { title: string; exercises: Exercise[] }) => Sequence;
   updateCustomSequence: (id: string, input: { title: string; exercises: Exercise[] }) => void;
   removeCustomSequence: (id: string) => void;
   pushRecent: (id: string) => void;
+  toggleFavorite: (id: string) => void;
 }
 
 export const useSequencesStore = create<SequencesState>()(
@@ -21,6 +24,7 @@ export const useSequencesStore = create<SequencesState>()(
     (set, get) => ({
       customSequences: CUSTOM_SEEDS,
       recentIds: [],
+      favoriteIds: [],
 
       getById: (id) => BASE_SEQUENCES.find((sequence) => sequence.id === id) ?? get().customSequences.find((sequence) => sequence.id === id),
 
@@ -43,6 +47,14 @@ export const useSequencesStore = create<SequencesState>()(
       pushRecent: (id) => {
         set((state) => ({ recentIds: [id, ...state.recentIds.filter((r) => r !== id)].slice(0, 5) }));
       },
+
+      toggleFavorite: (id) => {
+        set((state) => ({
+          favoriteIds: state.favoriteIds.includes(id)
+            ? state.favoriteIds.filter((favoriteId) => favoriteId !== id)
+            : [id, ...state.favoriteIds],
+        }));
+      },
     }),
     { name: 'yogaholic/sequences', storage }
   )
@@ -51,7 +63,7 @@ export const useSequencesStore = create<SequencesState>()(
 /** Pure selector (no store dependency) so category logic is trivial to unit test. */
 export function selectSequencesForCategory(
   category: SequenceCategory,
-  state: { customSequences: Sequence[]; recentIds: string[] }
+  state: { customSequences: Sequence[]; recentIds: string[]; favoriteIds: string[] }
 ): Sequence[] {
   switch (category) {
     case 'recent':
@@ -59,7 +71,9 @@ export function selectSequencesForCategory(
         .map((id) => BASE_SEQUENCES.find((sequence) => sequence.id === id) ?? state.customSequences.find((sequence) => sequence.id === id))
         .filter((sequence): sequence is Sequence => Boolean(sequence));
     case 'saved':
-      return BASE_SEQUENCES.filter((sequence) => sequence.tags?.includes('saved'));
+      return state.favoriteIds
+        .map((id) => BASE_SEQUENCES.find((sequence) => sequence.id === id) ?? state.customSequences.find((sequence) => sequence.id === id))
+        .filter((sequence): sequence is Sequence => Boolean(sequence));
     case 'sample':
       return BASE_SEQUENCES.filter((sequence) => sequence.tags?.includes('sample'));
     case 'custom':

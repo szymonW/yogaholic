@@ -19,7 +19,6 @@ import { colors, radius, spacing, typography } from '@/theme';
 import type { SequenceCategory } from '@/types';
 import { computeStreak, summarizeWeek } from '@/utils/history';
 
-const SAVED_COUNT = BASE_SEQUENCES.filter((sequence) => sequence.tags?.includes('saved')).length;
 const SAMPLE_COUNT = BASE_SEQUENCES.filter((sequence) => sequence.tags?.includes('sample')).length;
 
 interface TileConfig {
@@ -35,6 +34,7 @@ export default function Home() {
 
   const recentCount = useSequencesStore((state) => state.recentIds.length);
   const customCount = useSequencesStore((state) => state.customSequences.length);
+  const savedCount = useSequencesStore((state) => state.favoriteIds.length);
   const goalHistory = useGoalsStore((state) => state.goalHistory);
   const goalSessions = goalHistory[goalHistory.length - 1].sessionsPerDay.reduce((sum, count) => sum + count, 0);
   const entries = useHistoryStore((state) => state.entries);
@@ -56,7 +56,7 @@ export default function Home() {
     {
       key: 'saved',
       title: 'Ulubione',
-      subtitle: `${SAVED_COUNT} sekwencji`,
+      subtitle: `${savedCount} sekwencji`,
       Icon: BookmarkIcon,
       onPress: () => openCategory('saved'),
     },

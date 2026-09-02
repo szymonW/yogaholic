@@ -24,12 +24,15 @@ export default function ListScreen() {
 
   const customSequences = useSequencesStore((state) => state.customSequences);
   const recentIds = useSequencesStore((state) => state.recentIds);
+  const favoriteIds = useSequencesStore((state) => state.favoriteIds);
   const removeCustomSequence = useSequencesStore((state) => state.removeCustomSequence);
+  const toggleFavorite = useSequencesStore((state) => state.toggleFavorite);
   const historyEntries = useHistoryStore((state) => state.entries);
   const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
 
-  const sequences = selectSequencesForCategory(category, { customSequences, recentIds });
+  const sequences = selectSequencesForCategory(category, { customSequences, recentIds, favoriteIds });
   const customIds = new Set(customSequences.map((sequence) => sequence.id));
+  const favoriteIdSet = new Set(favoriteIds);
   const today = new Date();
 
   return (
@@ -63,6 +66,8 @@ export default function ListScreen() {
               onOpenDetail={() => router.push(editable ? `/create?id=${sequence.id}` : `/detail/${sequence.id}`)}
               isEditable={editable}
               onDelete={isCustom ? () => setPendingDelete({ id: sequence.id, title: sequence.title }) : undefined}
+              isFavorite={favoriteIdSet.has(sequence.id)}
+              onToggleFavorite={() => toggleFavorite(sequence.id)}
             />
           );
         })}

@@ -17,12 +17,12 @@ const SUN_SALUTATION_ROUND: Exercise[] = [
 ];
 
 // Ported 1:1 from the approved Claude Design mockup (const BASE_SEQUENCES).
-// Immutable, app-provided sequences — "sample" and/or "saved".
+// Immutable, app-provided sequences. Favoriting ("saved") is tracked separately,
+// per-user, in sequencesStore — not baked into this data.
 export const BASE_SEQUENCES: Sequence[] = [
   {
     id: 's1',
     title: 'Poranne przebudzenie',
-    tags: ['saved'],
     exercises: [
       { name: 'Pozycja góry (Tadasana)', duration: 30 },
       { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 45 },
@@ -34,7 +34,6 @@ export const BASE_SEQUENCES: Sequence[] = [
   {
     id: 's3',
     title: 'Wieczorne rozciąganie',
-    tags: ['saved'],
     exercises: [
       { name: 'Pozycja kota i krowy (Marjaryasana-Bitilasana)', duration: 40 },
       { name: 'Skrętoskłon leżący Prawa (Supta Matsyendrasana)', duration: 45 },
@@ -45,7 +44,6 @@ export const BASE_SEQUENCES: Sequence[] = [
   {
     id: 'sv3',
     title: 'Joga dla pleców',
-    tags: ['saved'],
     exercises: [
       { name: 'Pozycja kota i krowy (Marjaryasana-Bitilasana)', duration: 40 },
       { name: 'Kobra (Bhujangasana)', duration: 30 },
