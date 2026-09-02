@@ -20,12 +20,14 @@ export function ScreenHeader({ title, subtitle, onBack, size = 'h1', action }: S
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
-      <IconButton onPress={onBack} accessibilityLabel="Wstecz">
-        <ChevronLeftIcon />
-      </IconButton>
-      <View style={styles.titleRow}>
-        <Text style={[typography[size], styles.title]}>{title}</Text>
-        {action}
+      <View style={styles.headerRow}>
+        <IconButton onPress={onBack} accessibilityLabel="Wstecz">
+          <ChevronLeftIcon />
+        </IconButton>
+        <View style={styles.titleRow}>
+          <Text style={[typography[size], styles.title]}>{title}</Text>
+          {action}
+        </View>
       </View>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>
@@ -39,7 +41,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.md,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
   titleRow: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

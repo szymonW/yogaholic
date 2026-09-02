@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing } from '@/theme';
-import { TrashIcon } from './icons';
+import { BookmarkIcon, TrashIcon } from './icons';
 
 interface SequenceCardProps {
   title: string;
@@ -12,13 +12,42 @@ interface SequenceCardProps {
   isEditable: boolean;
   /** Only shown (and the sequence deletable) when provided — custom sequences only. */
   onDelete?: () => void;
+  /** Whether the sequence is in the user's favorites. */
+  isFavorite?: boolean;
+  /** Only shown when provided — toggles the sequence's favorite status. */
+  onToggleFavorite?: () => void;
 }
 
-export function SequenceCard({ title, subtitle, lastLabel, onStart, onOpenDetail, isEditable, onDelete }: SequenceCardProps) {
+export function SequenceCard({
+  title,
+  subtitle,
+  lastLabel,
+  onStart,
+  onOpenDetail,
+  isEditable,
+  onDelete,
+  isFavorite,
+  onToggleFavorite,
+}: SequenceCardProps) {
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <View style={styles.headerRow}>
+        <View style={styles.headerText}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+        </View>
+        {onToggleFavorite ? (
+          <Pressable
+            onPress={onToggleFavorite}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={isFavorite ? `Usuń ${title} z ulubionych` : `Dodaj ${title} do ulubionych`}
+            style={({ pressed }) => [styles.favoriteButton, pressed && styles.pressed]}
+          >
+            <BookmarkIcon size={22} filled={isFavorite} color={isFavorite ? colors.accent : colors.textTertiary} />
+          </Pressable>
+        ) : null}
+      </View>
       {lastLabel ? <Text style={styles.lastLabel}>Ostatnio: {lastLabel}</Text> : null}
       <View style={styles.actions}>
         <Pressable onPress={onStart} style={({ pressed }) => [styles.startButton, pressed && styles.pressed]}>
@@ -49,6 +78,15 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.xs,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  headerText: {
+    flex: 1,
+    minWidth: 0,
+  },
   title: {
     fontSize: 17,
     fontWeight: '600',
@@ -57,6 +95,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: colors.textSecondary,
+  },
+  favoriteButton: {
+    flexShrink: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   lastLabel: {
     fontSize: 12,

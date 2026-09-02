@@ -31,10 +31,12 @@ export default function DetailScreen() {
   return (
     <ScreenBackground style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-        <IconButton onPress={goBack} accessibilityLabel="Wstecz">
-          <ChevronLeftIcon />
-        </IconButton>
-        <Text style={[typography.h2, styles.title]}>{sequence.title}</Text>
+        <View style={styles.headerRow}>
+          <IconButton onPress={goBack} accessibilityLabel="Wstecz">
+            <ChevronLeftIcon />
+          </IconButton>
+          <Text style={[typography.h2, styles.title]}>{sequence.title}</Text>
+        </View>
         <Text style={styles.subtitle}>
           {sequence.exercises.length} pozycji • {totalDuration(sequence.exercises)} łącznie
         </Text>
@@ -63,7 +65,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxs,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
   title: {
+    flex: 1,
+    minWidth: 0,
     color: colors.textPrimary,
   },
   subtitle: {
