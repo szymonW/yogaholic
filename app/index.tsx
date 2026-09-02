@@ -14,6 +14,7 @@ import {
 } from '@/components/icons';
 import type { IconProps } from '@/components/icons';
 import { BASE_SEQUENCES } from '@/data/sampleSequences';
+import { useTranslation } from '@/i18n';
 import { useGoalsStore, useHistoryStore, useSequencesStore } from '@/store';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { SequenceCategory } from '@/types';
@@ -30,6 +31,7 @@ interface TileConfig {
 }
 
 export default function Home() {
+  const t = useTranslation();
   const insets = useSafeAreaInsets();
 
   const recentCount = useSequencesStore((state) => state.recentIds.length);
@@ -48,43 +50,43 @@ export default function Home() {
   const tiles: TileConfig[] = [
     {
       key: 'recent',
-      title: 'Ostatnio ćwiczone',
-      subtitle: `${recentCount} sekwencji`,
+      title: t.categories.recent,
+      subtitle: t.home.sequencesCount(recentCount),
       Icon: ClockIcon,
       onPress: () => openCategory('recent'),
     },
     {
       key: 'saved',
-      title: 'Ulubione',
-      subtitle: `${savedCount} sekwencji`,
+      title: t.categories.saved,
+      subtitle: t.home.sequencesCount(savedCount),
       Icon: BookmarkIcon,
       onPress: () => openCategory('saved'),
     },
     {
       key: 'sample',
-      title: 'Przykładowe sekwencje',
-      subtitle: `${SAMPLE_COUNT} sekwencji`,
+      title: t.categories.sample,
+      subtitle: t.home.sequencesCount(SAMPLE_COUNT),
       Icon: SparkleIcon,
       onPress: () => openCategory('sample'),
     },
     {
       key: 'custom',
-      title: 'Własne sekwencje',
-      subtitle: `${customCount} sekwencji`,
+      title: t.categories.custom,
+      subtitle: t.home.sequencesCount(customCount),
       Icon: CirclePlusIcon,
       onPress: () => openCategory('custom'),
     },
     {
       key: 'calendar',
-      title: 'Kalendarz',
-      subtitle: `seria ${streak} dni`,
+      title: t.home.calendarTitle,
+      subtitle: t.home.streakDays(streak),
       Icon: CalendarIcon,
       onPress: () => router.push('/calendar'),
     },
     {
       key: 'goals',
-      title: 'Cele',
-      subtitle: `${sessionsDone}/${goalSessions} w tym tyg.`,
+      title: t.home.goalsTitle,
+      subtitle: t.home.weekProgress(sessionsDone, goalSessions),
       Icon: TargetIcon,
       onPress: () => router.push('/goals'),
     },
@@ -93,8 +95,8 @@ export default function Home() {
   return (
     <ScreenBackground style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-        <Text style={[typography.display, styles.title]}>Yogaholic</Text>
-        <IconButton onPress={() => router.push('/settings')} accessibilityLabel="Ustawienia" style={styles.settingsButton}>
+        <Text style={[typography.display, styles.title]}>{t.home.brand}</Text>
+        <IconButton onPress={() => router.push('/settings')} accessibilityLabel={t.home.settingsA11y} style={styles.settingsButton}>
           <SettingsIcon />
         </IconButton>
       </View>

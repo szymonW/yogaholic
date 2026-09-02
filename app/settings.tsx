@@ -29,7 +29,9 @@ function SettingsRow({ label, value, toggleValue, onPress, isLast }: SettingsRow
       accessibilityRole={isToggle ? 'switch' : onPress ? 'button' : undefined}
       accessibilityState={isToggle ? { checked: toggleValue } : undefined}
     >
-      <Text style={styles.rowLabel}>{label}</Text>
+      <Text style={styles.rowLabel} numberOfLines={1}>
+        {label}
+      </Text>
       {isToggle ? <Toggle value={toggleValue} /> : <Text style={styles.rowValue}>{value}</Text>}
     </Wrapper>
   );
@@ -51,17 +53,21 @@ export default function SettingsScreen() {
 
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title={t.settingsTitle} onBack={goBack} />
+      <ScreenHeader title={t.settings.title} onBack={goBack} />
       <View style={styles.content}>
         <View style={styles.card}>
-          <SettingsRow label={t.notifications} toggleValue={notificationsEnabled} onPress={toggleNotifications} />
-          <SettingsRow label={t.instructorVoice} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
-          <SettingsRow label={t.prepCountdown} value={t.prepCountdownValue(prepCountdownSeconds)} onPress={cyclePrepCountdown} />
-          <SettingsRow label={t.language} value={currentLanguageLabel} onPress={() => setLanguagePickerVisible(true)} isLast />
+          <SettingsRow label={t.settings.notifications} toggleValue={notificationsEnabled} onPress={toggleNotifications} />
+          <SettingsRow label={t.settings.sounds} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
+          <SettingsRow
+            label={t.settings.prepCountdown}
+            value={t.settings.prepCountdownValue(prepCountdownSeconds)}
+            onPress={cyclePrepCountdown}
+          />
+          <SettingsRow label={t.settings.language} value={currentLanguageLabel} onPress={() => setLanguagePickerVisible(true)} isLast />
         </View>
 
         <View style={styles.card}>
-          <SettingsRow label={t.appVersion} value={Constants.expoConfig?.version ?? '1.0.0'} isLast />
+          <SettingsRow label={t.settings.appVersion} value={Constants.expoConfig?.version ?? '1.0.0'} isLast />
         </View>
       </View>
 
@@ -94,6 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.md,
     paddingVertical: 14,
     paddingHorizontal: spacing.lg,
   },
@@ -101,12 +108,21 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  // Only the label may ever give up width; the value always renders at its intrinsic size.
+  // Deliberately `flexShrink` and NOT `flex: 1` — on Android a growing label swallows the row
+  // and squeezes the value even though the value is set never to shrink, which truncated
+  // single unbreakable tokens like "1.0.0" and "Polski".
   rowLabel: {
+    flexShrink: 1,
+    minWidth: 0,
     fontSize: 16,
+    fontWeight: '400',
     color: colors.textPrimary,
   },
   rowValue: {
+    flexShrink: 0,
     fontSize: 15,
+    fontWeight: '400',
     color: colors.textSecondary,
   },
 });

@@ -1,25 +1,6 @@
 import type { DayEvent, HistoryEntry } from '@/types';
 import { addDays, parseISODate, toISODate } from './history';
 
-export const WEEKDAY_LETTERS_PL = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
-
-const MONTH_NAMES_PL = [
-  'Styczeń',
-  'Luty',
-  'Marzec',
-  'Kwiecień',
-  'Maj',
-  'Czerwiec',
-  'Lipiec',
-  'Sierpień',
-  'Wrzesień',
-  'Październik',
-  'Listopad',
-  'Grudzień',
-];
-
-const MONTH_NAMES_SHORT_PL = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
-
 export interface WeekDayInfo {
   date: Date;
   iso: string;
@@ -44,7 +25,8 @@ export function getWeekDays(
   eventsByISODate: Map<string, DayEvent[]>,
   radius = 3,
   today: Date = anchor,
-  getSessionGoal: (date: Date) => number = () => 0
+  getSessionGoal: (date: Date) => number = () => 0,
+  weekdayLetters: readonly string[]
 ): WeekDayInfo[] {
   const todayISO = toISODate(today);
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
@@ -56,7 +38,7 @@ export function getWeekDays(
     days.push({
       date,
       iso,
-      letter: WEEKDAY_LETTERS_PL[(date.getDay() + 6) % 7],
+      letter: weekdayLetters[(date.getDay() + 6) % 7],
       dayNumber: date.getDate(),
       isToday: iso === todayISO,
       events,
@@ -66,9 +48,15 @@ export function getWeekDays(
   return days;
 }
 
-/** "5 sie" — a short day+month label for a week's date range. */
-export function formatShortDate(date: Date): string {
-  return `${date.getDate()} ${MONTH_NAMES_SHORT_PL[date.getMonth()]}`;
+export interface ShortDateLabels {
+  monthNamesShort: readonly string[];
+  /** Day/month order is language-specific ("5 sie" in Polish, "Aug 5" in English). */
+  shortDate: (day: number, month: string) => string;
+}
+
+/** "5 sie" / "Aug 5" — a short day+month label for a week's date range. */
+export function formatShortDate(date: Date, labels: ShortDateLabels): string {
+  return labels.shortDate(date.getDate(), labels.monthNamesShort[date.getMonth()]);
 }
 
 export type MonthCellState = 'empty' | 'today' | 'todayDone' | 'done' | 'missed' | 'missedGoal' | 'planned' | 'rest';
@@ -78,8 +66,8 @@ export interface MonthCell {
   state: MonthCellState;
 }
 
-export function getMonthLabel(today: Date): string {
-  return `${MONTH_NAMES_PL[today.getMonth()]} ${today.getFullYear()}`;
+export function getMonthLabel(today: Date, monthNames: readonly string[]): string {
+  return `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
 }
 
 /**

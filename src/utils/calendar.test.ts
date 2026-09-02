@@ -1,3 +1,5 @@
+import { en } from '@/i18n/locales/en';
+import { pl } from '@/i18n/locales/pl';
 import type { DayEvent, HistoryEntry } from '@/types';
 import {
   formatShortDate,
@@ -22,7 +24,7 @@ const flatGoal = (sessionsPerDay: number[]) => (date: Date) => sessionsPerDay[(d
 describe('getWeekDays', () => {
   it('returns 2*radius+1 days centered on today with correct letters', () => {
     const wednesday = new Date(2026, 7, 5); // Wednesday
-    const days = getWeekDays(wednesday, new Map());
+    const days = getWeekDays(wednesday, new Map(), undefined, undefined, undefined, pl.calendar.weekdayLetters);
     expect(days).toHaveLength(7);
     expect(days[3].isToday).toBe(true);
     expect(days[3].letter).toBe('Śr');
@@ -33,34 +35,34 @@ describe('getWeekDays', () => {
     const today = new Date(2026, 7, 5);
     const events: DayEvent[] = [{ hour: 7, minute: 0, durationMinutes: 30, status: 'done' }];
     const map = new Map([['2026-08-05', events]]);
-    const days = getWeekDays(today, map);
+    const days = getWeekDays(today, map, undefined, undefined, undefined, pl.calendar.weekdayLetters);
     expect(days[3].events).toEqual(events);
     expect(days[0].events).toEqual([]);
   });
 
   it('supports a custom radius', () => {
     const today = new Date(2026, 7, 5);
-    expect(getWeekDays(today, new Map(), 1)).toHaveLength(3);
+    expect(getWeekDays(today, new Map(), 1, undefined, undefined, pl.calendar.weekdayLetters)).toHaveLength(3);
   });
 
   it('flags no day as today when the anchor week does not contain the real today', () => {
     const anchor = new Date(2026, 6, 29); // a week before today
     const realToday = new Date(2026, 7, 5);
-    const days = getWeekDays(anchor, new Map(), 3, realToday);
+    const days = getWeekDays(anchor, new Map(), 3, realToday, undefined, pl.calendar.weekdayLetters);
     expect(days.some((d) => d.isToday)).toBe(false);
   });
 
   it('flags the real today even when it sits away from the anchor-centered window', () => {
     const anchor = new Date(2026, 7, 6);
     const realToday = new Date(2026, 7, 5);
-    const days = getWeekDays(anchor, new Map(), 3, realToday);
+    const days = getWeekDays(anchor, new Map(), 3, realToday, undefined, pl.calendar.weekdayLetters);
     expect(days.find((d) => d.isToday)?.iso).toBe('2026-08-05');
   });
 
   it('flags a past, event-less day as missedGoal only when that weekday has a nonzero goal', () => {
     const today = new Date(2026, 7, 5); // Wednesday
     // Mon..Sun: Monday has a goal of 1, every other day is 0.
-    const days = getWeekDays(today, new Map(), 3, today, flatGoal([1, 0, 0, 0, 0, 0, 0]));
+    const days = getWeekDays(today, new Map(), 3, today, flatGoal([1, 0, 0, 0, 0, 0, 0]), pl.calendar.weekdayLetters);
     const monday = days.find((d) => d.letter === 'Pn');
     const tuesday = days.find((d) => d.letter === 'Wt');
     expect(monday?.missedGoal).toBe(true);
@@ -70,7 +72,7 @@ describe('getWeekDays', () => {
   it('does not flag missedGoal for a day with a logged session, or for today/future days', () => {
     const today = new Date(2026, 7, 5); // Wednesday
     const events = new Map([['2026-08-03', [{ hour: 7, minute: 0, durationMinutes: 30, status: 'done' as const }]]]);
-    const days = getWeekDays(today, events, 3, today, flatGoal([1, 1, 1, 1, 1, 1, 1]));
+    const days = getWeekDays(today, events, 3, today, flatGoal([1, 1, 1, 1, 1, 1, 1]), pl.calendar.weekdayLetters);
     const monday = days.find((d) => d.letter === 'Pn'); // has a logged session
     const wednesday = days.find((d) => d.letter === 'Śr'); // today
     const thursday = days.find((d) => d.letter === 'Cz'); // future
@@ -82,13 +84,17 @@ describe('getWeekDays', () => {
 
 describe('formatShortDate', () => {
   it('formats a day and abbreviated Polish month', () => {
-    expect(formatShortDate(new Date(2026, 7, 5))).toBe('5 sie');
+    expect(formatShortDate(new Date(2026, 7, 5), pl.calendar)).toBe('5 sie');
+  });
+
+  it('follows each language\'s own day/month order', () => {
+    expect(formatShortDate(new Date(2026, 7, 5), en.calendar)).toBe('Aug 5');
   });
 });
 
 describe('getMonthLabel', () => {
   it('formats the Polish month name and year', () => {
-    expect(getMonthLabel(new Date(2026, 7, 5))).toBe('Sierpień 2026');
+    expect(getMonthLabel(new Date(2026, 7, 5), pl.calendar.monthNames)).toBe('Sierpień 2026');
   });
 });
 

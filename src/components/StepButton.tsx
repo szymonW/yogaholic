@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
 import { useHoldRepeat } from '@/hooks/useHoldRepeat';
+import { useTranslation } from '@/i18n';
 import { colors, radius } from '@/theme';
 
 interface StepButtonProps {
@@ -12,6 +13,7 @@ interface StepButtonProps {
 /** A tap steps once; holding it down keeps stepping on an interval until released. */
 export function StepButton({ label, onStep, style, accessibilityLabel }: StepButtonProps) {
   const { onPressIn, onPressOut, onPress } = useHoldRepeat(onStep);
+  const t = useTranslation();
 
   return (
     <Pressable
@@ -19,7 +21,7 @@ export function StepButton({ label, onStep, style, accessibilityLabel }: StepBut
       onPressOut={onPressOut}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel ?? (label === '+' ? 'Zwiększ czas' : 'Zmniejsz czas')}
+      accessibilityLabel={accessibilityLabel ?? (label === '+' ? t.stepButton.increaseA11y : t.stepButton.decreaseA11y)}
       style={[styles.base, style]}
     >
       <Text style={styles.label}>{label}</Text>

@@ -3,12 +3,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, IconButton, ScreenBackground } from '@/components';
 import { ChevronLeftIcon } from '@/components/icons';
+import { useTranslation } from '@/i18n';
 import { useSequencesStore } from '@/store';
 import { colors, spacing, typography } from '@/theme';
 import { goBack } from '@/utils/navigation';
 import { formatDuration, totalDuration } from '@/utils/time';
 
 export default function DetailScreen() {
+  const t = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const sequence = useSequencesStore((state) => state.getById(id));
@@ -17,12 +19,12 @@ export default function DetailScreen() {
     return (
       <ScreenBackground style={styles.root}>
         <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-          <IconButton onPress={goBack} accessibilityLabel="Wstecz">
+          <IconButton onPress={goBack} accessibilityLabel={t.common.back}>
             <ChevronLeftIcon />
           </IconButton>
         </View>
         <View style={styles.content}>
-          <Text style={typography.body}>Nie znaleziono sekwencji.</Text>
+          <Text style={typography.body}>{t.detail.notFound}</Text>
         </View>
       </ScreenBackground>
     );
@@ -32,27 +34,25 @@ export default function DetailScreen() {
     <ScreenBackground style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
         <View style={styles.headerRow}>
-          <IconButton onPress={goBack} accessibilityLabel="Wstecz">
+          <IconButton onPress={goBack} accessibilityLabel={t.common.back}>
             <ChevronLeftIcon />
           </IconButton>
-          <Text style={[typography.h2, styles.title]}>{sequence.title}</Text>
+          <Text style={[typography.h2, styles.title]}>{t.sequences[sequence.id] ?? sequence.title}</Text>
         </View>
-        <Text style={styles.subtitle}>
-          {sequence.exercises.length} pozycji • {totalDuration(sequence.exercises)} łącznie
-        </Text>
+        <Text style={styles.subtitle}>{t.detail.subtitle(sequence.exercises.length, totalDuration(sequence.exercises))}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.list}>
         {sequence.exercises.map((exercise, index) => (
           <View key={`${exercise.name}-${index}`} style={styles.row}>
-            <Text style={styles.exerciseName}>{exercise.name}</Text>
+            <Text style={styles.exerciseName}>{t.exercises[exercise.name] ?? exercise.name}</Text>
             <Text style={styles.exerciseTime}>{formatDuration(exercise.duration)}</Text>
           </View>
         ))}
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title="Rozpocznij sekwencję" size="lg" onPress={() => router.push(`/run/${sequence.id}`)} />
+        <Button title={t.detail.start} size="lg" onPress={() => router.push(`/run/${sequence.id}`)} />
       </View>
     </ScreenBackground>
   );

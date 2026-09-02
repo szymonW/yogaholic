@@ -15,12 +15,12 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
   const t = useTranslation();
   return (
     <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
-      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} accessibilityLabel={t.close} />
+      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} accessibilityLabel={t.common.close} />
       <View style={styles.centerWrap} pointerEvents="box-none">
         <View style={styles.card}>
           <View style={styles.header}>
-            <Text style={[typography.bodyLg, styles.title]}>{t.languagePickerTitle}</Text>
-            <IconButton accessibilityLabel={t.close} onPress={onClose} size={32}>
+            <Text style={[typography.bodyLg, styles.title]}>{t.languagePicker.title}</Text>
+            <IconButton accessibilityLabel={t.common.close} onPress={onClose} size={32}>
               <CloseIcon />
             </IconButton>
           </View>
@@ -41,11 +41,13 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
                     pressed && option.available && styles.rowPressed,
                   ]}
                 >
-                  <Text style={[styles.rowLabel, !option.available && styles.rowLabelDisabled]}>{option.label}</Text>
+                  <Text style={[styles.rowLabel, !option.available && styles.rowLabelDisabled]} numberOfLines={1}>
+                    {option.label}
+                  </Text>
                   {isSelected ? (
-                    <CheckIcon size={22} strokeWidth={2} />
+                    <CheckIcon size={22} strokeWidth={2} color={colors.success} />
                   ) : !option.available ? (
-                    <Text style={styles.rowBadge}>{t.comingSoon}</Text>
+                    <Text style={styles.rowBadge}>{t.languagePicker.comingSoon}</Text>
                   ) : null}
                 </Pressable>
               );
@@ -93,6 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.sm,
     paddingVertical: 14,
     paddingHorizontal: spacing.xs,
   },
@@ -103,15 +106,23 @@ const styles = StyleSheet.create({
   rowPressed: {
     opacity: 0.6,
   },
+  // Only the label may ever give up width; the badge and the check keep their intrinsic size.
+  // Deliberately `flexShrink` and NOT `flex: 1` — on Android a growing label swallows the row
+  // and squeezes the badge even though the badge is set never to shrink ("wkrótce" → "wkrót…").
   rowLabel: {
+    flexShrink: 1,
+    minWidth: 0,
     fontSize: 16,
+    fontWeight: '400',
     color: colors.textPrimary,
   },
   rowLabelDisabled: {
     color: colors.textFaint,
   },
   rowBadge: {
+    flexShrink: 0,
     fontSize: 13,
+    fontWeight: '400',
     color: colors.textFaint,
   },
 });

@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button, ScreenBackground, ScreenHeader, StepButton } from '@/components';
+import { useTranslation } from '@/i18n';
 import { useExercisePoolStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { goBack } from '@/utils/navigation';
@@ -14,6 +15,7 @@ const DURATION_DEFAULT = 30;
 const IMAGE_ASPECT_RATIO = 3 / 2 / 0.7;
 
 export default function CreateExerciseModal() {
+  const t = useTranslation();
   const [name, setName] = useState('');
   const [duration, setDuration] = useState(DURATION_DEFAULT);
   const [imageUri, setImageUri] = useState<ImageSourcePropType | undefined>();
@@ -44,33 +46,33 @@ export default function CreateExerciseModal() {
 
   return (
     <ScreenBackground style={styles.root}>
-      <ScreenHeader title="Nowe ćwiczenie" size="h2" onBack={goBack} />
+      <ScreenHeader title={t.createExercise.title} size="h2" onBack={goBack} />
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.field}>
-          <Text style={styles.label}>Obrazek (opcjonalnie)</Text>
+          <Text style={styles.label}>{t.createExercise.imageLabel}</Text>
           <Pressable onPress={pickImage} style={styles.imageBox}>
             {imageUri ? (
               <Image source={imageUri} style={styles.imagePreview} resizeMode="cover" />
             ) : (
-              <Text style={styles.imagePlaceholder}>Kliknij aby dodać obrazek</Text>
+              <Text style={styles.imagePlaceholder}>{t.createExercise.imagePlaceholder}</Text>
             )}
           </Pressable>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Nazwa ćwiczenia</Text>
+          <Text style={styles.label}>{t.createExercise.nameLabel}</Text>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="np. Asana"
+            placeholder={t.createExercise.namePlaceholder}
             placeholderTextColor={colors.textTertiary}
             style={styles.input}
           />
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Czas</Text>
+          <Text style={styles.label}>{t.createExercise.timeLabel}</Text>
           <View style={styles.durationRow}>
             <StepButton label="−" onStep={() => setDuration((d) => Math.max(DURATION_MIN, d - DURATION_STEP))} />
             <Text style={styles.durationValue}>{formatDuration(duration)}</Text>
@@ -79,15 +81,15 @@ export default function CreateExerciseModal() {
         </View>
 
         <View style={styles.actions}>
-          <Button title="Anuluj" variant="secondary" size="sm" style={[styles.flex1, styles.cancelButton]} onPress={goBack} />
-          <Button title="Zapisz" size="sm" style={styles.flex1} disabled={!canSave} onPress={handleSave} />
+          <Button title={t.common.cancel} variant="secondary" size="sm" style={[styles.flex1, styles.cancelButton]} onPress={goBack} />
+          <Button title={t.createExercise.save} size="sm" style={styles.flex1} disabled={!canSave} onPress={handleSave} />
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Twoje ćwiczenia ({customExercises.length})</Text>
+          <Text style={styles.label}>{t.createExercise.yourExercises(customExercises.length)}</Text>
 
           {customExercises.length === 0 ? (
-            <Text style={styles.emptyText}>Nie dodałeś jeszcze żadnego ćwiczenia.</Text>
+            <Text style={styles.emptyText}>{t.createExercise.empty}</Text>
           ) : (
             customExercises.map((exercise, index) => (
               <View key={`${exercise.name}-${index}`} style={styles.itemRow}>
@@ -95,7 +97,11 @@ export default function CreateExerciseModal() {
                 <StepButton label="−" onStep={() => changeExerciseDuration(index, -DURATION_STEP)} />
                 <Text style={styles.itemTime}>{formatDuration(exercise.duration)}</Text>
                 <StepButton label="+" onStep={() => changeExerciseDuration(index, DURATION_STEP)} />
-                <Pressable onPress={() => removeExercise(index)} accessibilityLabel={`Usuń ${exercise.name}`} style={styles.removeButton}>
+                <Pressable
+                  onPress={() => removeExercise(index)}
+                  accessibilityLabel={t.createExercise.removeA11y(exercise.name)}
+                  style={styles.removeButton}
+                >
                   <Text style={styles.removeLabel}>×</Text>
                 </Pressable>
               </View>

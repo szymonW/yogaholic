@@ -5,16 +5,17 @@ export interface LanguageOption {
   available: boolean;
 }
 
-// Labels are shown as-is regardless of the current UI language (like a native language picker).
+// Endonyms: each language is labelled in itself, so the list reads the same whichever UI
+// language is active (the labels are never translated).
 export const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'pl', label: 'Polski', available: true },
-  { code: 'en', label: 'Angielski', available: false },
-  { code: 'de', label: 'Niemiecki', available: false },
-  { code: 'fr', label: 'Francuski', available: false },
-  { code: 'es', label: 'Hiszpański', available: false },
-  { code: 'pt', label: 'Portugalski', available: false },
-  { code: 'ko', label: 'Koreański', available: false },
-  { code: 'ja', label: 'Japoński', available: false },
+  { code: 'en', label: 'English', available: true },
+  { code: 'de', label: 'Deutsch', available: false },
+  { code: 'fr', label: 'Français', available: false },
+  { code: 'es', label: 'Español', available: false },
+  { code: 'pt', label: 'Português', available: false },
+  { code: 'ko', label: '한국어', available: false },
+  { code: 'ja', label: '日本語', available: false },
 ];
 
 // Only device languages we actually ship translations for get auto-selected; everything else

@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Button, ConfirmDialog, ScreenBackground, ScreenHeader, SequenceCard } from '@/components';
+import { useTranslation } from '@/i18n';
 import { selectSequencesForCategory, useHistoryStore, useSequencesStore } from '@/store';
 import { colors, spacing } from '@/theme';
 import type { SequenceCategory } from '@/types';
@@ -9,16 +10,10 @@ import { formatRelativeDays, getLastPracticedDate } from '@/utils/history';
 import { goBack } from '@/utils/navigation';
 import { totalDuration } from '@/utils/time';
 
-const CATEGORY_LABELS: Record<SequenceCategory, string> = {
-  recent: 'Ostatnio ćwiczone',
-  saved: 'Ulubione',
-  sample: 'Przykładowe sekwencje',
-  custom: 'Własne sekwencje',
-};
-
 export default function ListScreen() {
+  const t = useTranslation();
   const { category } = useLocalSearchParams<{ category: SequenceCategory }>();
-  const label = CATEGORY_LABELS[category] ?? category;
+  const label = t.categories[category] ?? category;
   const isCustom = category === 'custom';
   const isRecent = category === 'recent';
 
@@ -41,31 +36,27 @@ export default function ListScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         {isCustom ? (
           <>
-            <Button title="+ Nowa sekwencja" variant="secondary" style={styles.dashed} onPress={() => router.push('/create')} />
-            <Button
-              title="+ Nowe ćwiczenie"
-              variant="secondary"
-              style={styles.dashed}
-              onPress={() => router.push('/create-exercise')}
-            />
+            <Button title={t.list.newSequence} variant="secondary" style={styles.dashed} onPress={() => router.push('/create')} />
+            <Button title={t.list.newExercise} variant="secondary" style={styles.dashed} onPress={() => router.push('/create-exercise')} />
           </>
         ) : null}
 
-        {sequences.length === 0 ? <Text style={styles.empty}>Brak sekwencji w tej kategorii.</Text> : null}
+        {sequences.length === 0 ? <Text style={styles.empty}>{t.list.empty}</Text> : null}
 
         {sequences.map((sequence) => {
           const lastPracticed = isRecent ? getLastPracticedDate(historyEntries, sequence.id) : undefined;
           const editable = customIds.has(sequence.id);
+          const title = t.sequences[sequence.id] ?? sequence.title;
           return (
             <SequenceCard
               key={sequence.id}
-              title={sequence.title}
-              subtitle={`${sequence.exercises.length} pozycji • ${totalDuration(sequence.exercises)} łącznie`}
-              lastLabel={lastPracticed ? formatRelativeDays(lastPracticed, today) : undefined}
+              title={title}
+              subtitle={t.list.subtitleDetail(sequence.exercises.length, totalDuration(sequence.exercises))}
+              lastLabel={lastPracticed ? formatRelativeDays(lastPracticed, today, t.history) : undefined}
               onStart={() => router.push(`/run/${sequence.id}`)}
               onOpenDetail={() => router.push(editable ? `/create?id=${sequence.id}` : `/detail/${sequence.id}`)}
               isEditable={editable}
-              onDelete={isCustom ? () => setPendingDelete({ id: sequence.id, title: sequence.title }) : undefined}
+              onDelete={isCustom ? () => setPendingDelete({ id: sequence.id, title }) : undefined}
               isFavorite={favoriteIdSet.has(sequence.id)}
               onToggleFavorite={() => toggleFavorite(sequence.id)}
             />
@@ -75,9 +66,8 @@ export default function ListScreen() {
 
       <ConfirmDialog
         visible={pendingDelete !== null}
-        title="Usunąć sekwencję?"
-        message={pendingDelete ? `Sekwencja „${pendingDelete.title}” zostanie trwale usunięta. Tej operacji nie można cofnąć.` : undefined}
-        confirmLabel="Usuń"
+        title={t.list.deleteTitle}
+        message={pendingDelete ? t.list.deleteMessage(pendingDelete.title) : undefined}
         onConfirm={() => {
           if (pendingDelete) removeCustomSequence(pendingDelete.id);
           setPendingDelete(null);

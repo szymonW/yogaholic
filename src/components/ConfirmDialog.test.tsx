@@ -1,7 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { useSettingsStore } from '@/store';
 import { ConfirmDialog } from './ConfirmDialog';
 
 describe('ConfirmDialog', () => {
+  // The default confirm/cancel labels come from the catalog, so pin the UI language instead of
+  // inheriting whatever detectInitialLanguage() makes of the test machine's device locale.
+  beforeEach(() => {
+    useSettingsStore.setState({ language: 'pl' });
+  });
+
   it('renders title/message and calls onConfirm/onCancel', async () => {
     const onConfirm = jest.fn();
     const onCancel = jest.fn();
