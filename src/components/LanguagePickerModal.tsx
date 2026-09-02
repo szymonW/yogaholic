@@ -47,7 +47,9 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
                   {isSelected ? (
                     <CheckIcon size={22} strokeWidth={2} color={colors.success} />
                   ) : !option.available ? (
-                    <Text style={styles.rowBadge}>{t.languagePicker.comingSoon}</Text>
+                    <Text style={styles.rowBadge} numberOfLines={1}>
+                      {t.languagePicker.comingSoon}
+                    </Text>
                   ) : null}
                 </Pressable>
               );

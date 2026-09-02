@@ -29,8 +29,16 @@ function SettingsRow({ label, value, toggleValue, onPress, isLast }: SettingsRow
       accessibilityRole={isToggle ? 'switch' : onPress ? 'button' : undefined}
       accessibilityState={isToggle ? { checked: toggleValue } : undefined}
     >
-      <Text style={styles.rowLabel}>{label}</Text>
-      {isToggle ? <Toggle value={toggleValue} /> : <Text style={styles.rowValue}>{value}</Text>}
+      <Text style={styles.rowLabel} numberOfLines={1}>
+        {label}
+      </Text>
+      {isToggle ? (
+        <Toggle value={toggleValue} />
+      ) : (
+        <Text style={styles.rowValue} numberOfLines={1}>
+          {value}
+        </Text>
+      )}
     </Wrapper>
   );
 }
@@ -55,7 +63,7 @@ export default function SettingsScreen() {
       <View style={styles.content}>
         <View style={styles.card}>
           <SettingsRow label={t.settings.notifications} toggleValue={notificationsEnabled} onPress={toggleNotifications} />
-          <SettingsRow label={t.settings.instructorVoice} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
+          <SettingsRow label={t.settings.sounds} toggleValue={instructorVoiceEnabled} onPress={toggleInstructorVoice} />
           <SettingsRow
             label={t.settings.prepCountdown}
             value={t.settings.prepCountdownValue(prepCountdownSeconds)}
@@ -98,6 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.md,
     paddingVertical: 14,
     paddingHorizontal: spacing.lg,
   },
@@ -105,11 +114,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  // The label absorbs all the slack so it is the only thing that can give; the value keeps its
+  // intrinsic width. Without this the label takes its full width first, the value is measured
+  // into whatever is left, and a single unbreakable token ("1.0.0", "Polski") has nowhere to
+  // wrap — so the card's overflow:hidden cuts its last character off.
   rowLabel: {
+    flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: colors.textPrimary,
   },
   rowValue: {
+    flexShrink: 0,
     fontSize: 15,
     color: colors.textSecondary,
   },

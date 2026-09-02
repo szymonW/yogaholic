@@ -92,11 +92,11 @@ export const pl = {
   settings: {
     title: 'Ustawienia',
     notifications: 'Powiadomienia',
-    instructorVoice: 'Głos instruktora',
+    sounds: 'Dźwięki',
     prepCountdown: 'Odliczanie przygotowania',
     prepCountdownValue: (seconds: number) => `${seconds} s`,
     language: 'Język',
-    appVersion: 'Wersji aplikacji',
+    appVersion: 'Wersja aplikacji',
   },
   languagePicker: {
     title: 'Język',

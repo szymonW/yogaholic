@@ -92,7 +92,7 @@ export const en: Translations = {
   settings: {
     title: 'Settings',
     notifications: 'Notifications',
-    instructorVoice: 'Instructor voice',
+    sounds: 'Sounds',
     prepCountdown: 'Preparation countdown',
     prepCountdownValue: (seconds: number) => `${seconds} s`,
     language: 'Language',
