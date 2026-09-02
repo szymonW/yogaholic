@@ -47,9 +47,7 @@ export function LanguagePickerModal({ visible, selectedCode, onSelect, onClose }
                   {isSelected ? (
                     <CheckIcon size={22} strokeWidth={2} color={colors.success} />
                   ) : !option.available ? (
-                    <Text style={styles.rowBadge} numberOfLines={1}>
-                      {t.languagePicker.comingSoon}
-                    </Text>
+                    <Text style={styles.rowBadge}>{t.languagePicker.comingSoon}</Text>
                   ) : null}
                 </Pressable>
               );
@@ -108,11 +106,11 @@ const styles = StyleSheet.create({
   rowPressed: {
     opacity: 0.6,
   },
-  // The label owns the leftover width so it is the only thing that can ever give; the badge and
-  // the check keep their intrinsic size. Without this both children shrink together and each
-  // loses its last characters ("wkrótce" → "wkrótc") once the OS font scale grows the row.
+  // Only the label may ever give up width; the badge and the check keep their intrinsic size.
+  // Deliberately `flexShrink` and NOT `flex: 1` — on Android a growing label swallows the row
+  // and squeezes the badge even though the badge is set never to shrink ("wkrótce" → "wkrót…").
   rowLabel: {
-    flex: 1,
+    flexShrink: 1,
     minWidth: 0,
     fontSize: 16,
     color: colors.textPrimary,

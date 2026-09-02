@@ -32,13 +32,7 @@ function SettingsRow({ label, value, toggleValue, onPress, isLast }: SettingsRow
       <Text style={styles.rowLabel} numberOfLines={1}>
         {label}
       </Text>
-      {isToggle ? (
-        <Toggle value={toggleValue} />
-      ) : (
-        <Text style={styles.rowValue} numberOfLines={1}>
-          {value}
-        </Text>
-      )}
+      {isToggle ? <Toggle value={toggleValue} /> : <Text style={styles.rowValue}>{value}</Text>}
     </Wrapper>
   );
 }
@@ -114,12 +108,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  // The label absorbs all the slack so it is the only thing that can give; the value keeps its
-  // intrinsic width. Without this the label takes its full width first, the value is measured
-  // into whatever is left, and a single unbreakable token ("1.0.0", "Polski") has nowhere to
-  // wrap — so the card's overflow:hidden cuts its last character off.
+  // Only the label may ever give up width; the value always renders at its intrinsic size.
+  // Deliberately `flexShrink` and NOT `flex: 1` — on Android a growing label swallows the row
+  // and squeezes the value even though the value is set never to shrink, which truncated
+  // single unbreakable tokens like "1.0.0" and "Polski".
   rowLabel: {
-    flex: 1,
+    flexShrink: 1,
     minWidth: 0,
     fontSize: 16,
     color: colors.textPrimary,
