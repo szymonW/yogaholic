@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ProgressBar, ScreenBackground, ScreenHeader, Toggle } from '@/components';
+import { ProgressBar, ScreenBackground, ScreenHeader, TimePickerModal, Toggle } from '@/components';
 import { useTranslation } from '@/i18n';
 import { useGoalsStore, useHistoryStore, useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
@@ -9,7 +10,17 @@ import { goBack } from '@/utils/navigation';
 export default function GoalsScreen() {
   const t = useTranslation();
   const { goalHistory, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
-  const { notificationsEnabled, reminderHour, toggleNotifications, setReminderHour } = useSettingsStore();
+  const {
+    notificationsEnabled,
+    reminderHour,
+    reminderMinute,
+    toggleNotifications,
+    incReminderHour,
+    decReminderHour,
+    incReminderMinute,
+    decReminderMinute,
+  } = useSettingsStore();
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
   const entries = useHistoryStore((state) => state.entries);
   // The screen only ever edits the current (latest) snapshot — a change never rewrites the past.
   const sessionsPerDay = goalHistory[goalHistory.length - 1].sessionsPerDay;
@@ -84,15 +95,9 @@ export default function GoalsScreen() {
             <Text style={styles.cardLabel}>{t.goals.reminder}</Text>
             <Toggle value={notificationsEnabled} />
           </Pressable>
-          <View style={styles.stepper}>
-            <Pressable onPress={() => setReminderHour(reminderHour - 1)} style={styles.stepButton}>
-              <Text style={styles.stepLabel}>−</Text>
-            </Pressable>
-            <Text style={styles.stepGoal}>{t.goals.reminderTime(reminderHour)}</Text>
-            <Pressable onPress={() => setReminderHour(reminderHour + 1)} style={styles.stepButton}>
-              <Text style={styles.stepLabel}>+</Text>
-            </Pressable>
-          </View>
+          <Pressable onPress={() => setTimePickerVisible(true)} style={styles.reminderTimeButton} hitSlop={spacing.sm}>
+            <Text style={styles.reminderTimeValue}>{t.goals.reminderTime(reminderHour, reminderMinute)}</Text>
+          </Pressable>
         </View>
 
         <View style={[styles.card, styles.streakCard]}>
@@ -100,6 +105,17 @@ export default function GoalsScreen() {
           <Text style={styles.streakValue}>{t.goals.streakDays(streak)}</Text>
         </View>
       </View>
+
+      <TimePickerModal
+        visible={timePickerVisible}
+        hour={reminderHour}
+        minute={reminderMinute}
+        onIncHour={incReminderHour}
+        onDecHour={decReminderHour}
+        onIncMinute={incReminderMinute}
+        onDecMinute={decReminderMinute}
+        onClose={() => setTimePickerVisible(false)}
+      />
     </ScreenBackground>
   );
 }
@@ -184,6 +200,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textSecondary,
     minWidth: 60,
+    textAlign: 'center',
+  },
+  reminderTimeButton: {
+    alignSelf: 'center',
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
+    backgroundColor: colors.background,
+  },
+  reminderTimeValue: {
+    fontSize: 40,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+    color: colors.accent,
     textAlign: 'center',
   },
   streakCard: {

@@ -10,3 +10,4 @@ export { SequenceCard } from './SequenceCard';
 export { Toggle } from './Toggle';
 export { ConfirmDialog } from './ConfirmDialog';
 export { LanguagePickerModal } from './LanguagePickerModal';
+export { TimePickerModal } from './TimePickerModal';
