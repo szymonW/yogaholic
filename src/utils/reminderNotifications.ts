@@ -42,11 +42,13 @@ export async function syncReminderNotification({ enabled, hour, minute, exercise
 
   if (!enabled) return;
 
+  // Android 13+ only shows the permission prompt correctly once the channel it'll post through
+  // already exists, so the channel must be created before requestPermissionsAsync is called.
+  await ensureAndroidChannel();
+
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   const status = existingStatus === 'granted' ? existingStatus : (await Notifications.requestPermissionsAsync()).status;
   if (status !== 'granted') return;
-
-  await ensureAndroidChannel();
 
   const now = new Date();
   const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0);
