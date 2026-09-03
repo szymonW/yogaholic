@@ -213,6 +213,8 @@ export const en: Translations = {
     perWeek: (n: number) => `${n} / wk`,
     minutesPerWeek: 'Minutes per week',
     goalMinutes: (n: number) => `goal: ${n}`,
+    reminder: 'Remind me to exercise',
+    reminderTime: (hour: number) => `${String(hour).padStart(2, '0')}:00`,
     currentStreak: 'Current streak',
     streakDays: (n: number) => (n === 1 ? '1 day' : `${n} days`),
   },

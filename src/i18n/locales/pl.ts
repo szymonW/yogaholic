@@ -212,6 +212,8 @@ export const pl = {
     perWeek: (n: number) => `${n} / tyg.`,
     minutesPerWeek: 'Minuty w tygodniu',
     goalMinutes: (n: number) => `cel: ${n}`,
+    reminder: 'Przypomnij mi o ćwiczeniach',
+    reminderTime: (hour: number) => `${String(hour).padStart(2, '0')}:00`,
     currentStreak: 'Aktualna seria',
     streakDays: (n: number) => `${n} dni`,
   },

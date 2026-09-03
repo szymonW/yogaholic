@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ProgressBar, ScreenBackground, ScreenHeader } from '@/components';
+import { ProgressBar, ScreenBackground, ScreenHeader, Toggle } from '@/components';
 import { useTranslation } from '@/i18n';
-import { useGoalsStore, useHistoryStore } from '@/store';
+import { useGoalsStore, useHistoryStore, useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { computeStreak, summarizeWeek } from '@/utils/history';
 import { goBack } from '@/utils/navigation';
@@ -9,6 +9,7 @@ import { goBack } from '@/utils/navigation';
 export default function GoalsScreen() {
   const t = useTranslation();
   const { goalHistory, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
+  const { notificationsEnabled, reminderHour, toggleNotifications, setReminderHour } = useSettingsStore();
   const entries = useHistoryStore((state) => state.entries);
   // The screen only ever edits the current (latest) snapshot — a change never rewrites the past.
   const sessionsPerDay = goalHistory[goalHistory.length - 1].sessionsPerDay;
@@ -73,6 +74,22 @@ export default function GoalsScreen() {
             </Pressable>
             <Text style={styles.stepGoal}>{t.goals.goalMinutes(goalMinutes)}</Text>
             <Pressable onPress={incGoalMinutes} style={styles.stepButton}>
+              <Text style={styles.stepLabel}>+</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Pressable style={styles.cardHeader} onPress={toggleNotifications} accessibilityRole="switch" accessibilityState={{ checked: notificationsEnabled }}>
+            <Text style={styles.cardLabel}>{t.goals.reminder}</Text>
+            <Toggle value={notificationsEnabled} />
+          </Pressable>
+          <View style={styles.stepper}>
+            <Pressable onPress={() => setReminderHour(reminderHour - 1)} style={styles.stepButton}>
+              <Text style={styles.stepLabel}>−</Text>
+            </Pressable>
+            <Text style={styles.stepGoal}>{t.goals.reminderTime(reminderHour)}</Text>
+            <Pressable onPress={() => setReminderHour(reminderHour + 1)} style={styles.stepButton}>
               <Text style={styles.stepLabel}>+</Text>
             </Pressable>
           </View>
