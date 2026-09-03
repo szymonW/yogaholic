@@ -117,7 +117,7 @@ export const en: Translations = {
     sequencesCount: (n: number) => (n === 1 ? '1 sequence' : `${n} sequences`),
     streakDays: (n: number) => `${n}-day streak`,
     weekProgress: (done: number, goal: number) => `${done}/${goal} this week`,
-    reminderBanner: "Time to practice! You haven't exercised today yet.",
+    reminderNotificationBody: "Time to practice! You haven't exercised today yet.",
   },
   list: {
     newSequence: '+ New sequence',
