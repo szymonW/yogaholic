@@ -10,16 +10,7 @@ import { goBack } from '@/utils/navigation';
 export default function GoalsScreen() {
   const t = useTranslation();
   const { goalHistory, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
-  const {
-    notificationsEnabled,
-    reminderHour,
-    reminderMinute,
-    toggleNotifications,
-    incReminderHour,
-    decReminderHour,
-    incReminderMinute,
-    decReminderMinute,
-  } = useSettingsStore();
+  const { notificationsEnabled, reminderHour, reminderMinute, toggleNotifications, setReminderTime } = useSettingsStore();
   const [timePickerVisible, setTimePickerVisible] = useState(false);
   const entries = useHistoryStore((state) => state.entries);
   // The screen only ever edits the current (latest) snapshot — a change never rewrites the past.
@@ -91,7 +82,12 @@ export default function GoalsScreen() {
         </View>
 
         <View style={styles.card}>
-          <Pressable style={styles.cardHeader} onPress={toggleNotifications} accessibilityRole="switch" accessibilityState={{ checked: notificationsEnabled }}>
+          <Pressable
+            style={[styles.cardHeader, styles.reminderHeader]}
+            onPress={toggleNotifications}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: notificationsEnabled }}
+          >
             <Text style={styles.cardLabel}>{t.goals.reminder}</Text>
             <Toggle value={notificationsEnabled} />
           </Pressable>
@@ -110,11 +106,11 @@ export default function GoalsScreen() {
         visible={timePickerVisible}
         hour={reminderHour}
         minute={reminderMinute}
-        onIncHour={incReminderHour}
-        onDecHour={decReminderHour}
-        onIncMinute={incReminderMinute}
-        onDecMinute={decReminderMinute}
-        onClose={() => setTimePickerVisible(false)}
+        onSave={(hour, minute) => {
+          setReminderTime(hour, minute);
+          setTimePickerVisible(false);
+        }}
+        onCancel={() => setTimePickerVisible(false)}
       />
     </ScreenBackground>
   );
@@ -137,6 +133,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
+  },
+  // The label sits next to a Toggle switch, not another line of text, so it's centered on the
+  // switch rather than aligned to its (nonexistent) text baseline.
+  reminderHeader: {
+    alignItems: 'center',
   },
   cardLabel: {
     fontSize: 16,
@@ -204,6 +205,9 @@ const styles = StyleSheet.create({
   },
   reminderTimeButton: {
     alignSelf: 'center',
+    // Card already puts `gap: spacing.md` above this button; add the difference so its distance
+    // from the label matches its distance from the card's bottom edge (padding: spacing.lg + 2).
+    marginTop: spacing.xs,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xs,
     borderRadius: radius.md,

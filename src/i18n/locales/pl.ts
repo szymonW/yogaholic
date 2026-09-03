@@ -86,6 +86,7 @@ export const pl = {
   common: {
     close: 'Zamknij',
     cancel: 'Anuluj',
+    save: 'Zapisz',
     delete: 'Usuń',
     back: 'Wstecz',
   },
@@ -116,6 +117,7 @@ export const pl = {
     sequencesCount: (n: number) => `${n} sekwencji`,
     streakDays: (n: number) => `seria ${n} dni`,
     weekProgress: (done: number, goal: number) => `${done}/${goal} w tym tyg.`,
+    reminderBanner: 'Czas na ćwiczenia! Dziś jeszcze nie ćwiczyłeś.',
   },
   list: {
     newSequence: '+ Nowa sekwencja',

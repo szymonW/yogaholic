@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import type { ReactElement } from 'react';
+import { type ReactElement, useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconButton, ScreenBackground } from '@/components';
@@ -15,10 +15,14 @@ import {
 import type { IconProps } from '@/components/icons';
 import { BASE_SEQUENCES } from '@/data/sampleSequences';
 import { useTranslation } from '@/i18n';
-import { useGoalsStore, useHistoryStore, useSequencesStore } from '@/store';
+import { useGoalsStore, useHistoryStore, useSequencesStore, useSettingsStore } from '@/store';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { SequenceCategory } from '@/types';
-import { computeStreak, summarizeWeek } from '@/utils/history';
+import { computeStreak, summarizeWeek, toISODate } from '@/utils/history';
+
+// Reminder banner re-evaluates on a timer (rather than only at mount) so it appears the moment
+// the set hour ticks over without requiring the user to leave and reopen the screen.
+const REMINDER_CHECK_INTERVAL_MS = 60_000;
 
 const SAMPLE_COUNT = BASE_SEQUENCES.filter((sequence) => sequence.tags?.includes('sample')).length;
 
@@ -40,10 +44,20 @@ export default function Home() {
   const goalHistory = useGoalsStore((state) => state.goalHistory);
   const goalSessions = goalHistory[goalHistory.length - 1].sessionsPerDay.reduce((sum, count) => sum + count, 0);
   const entries = useHistoryStore((state) => state.entries);
+  const { notificationsEnabled, reminderHour, reminderMinute } = useSettingsStore();
 
-  const today = new Date();
-  const { sessions: sessionsDone } = summarizeWeek(entries, today);
-  const streak = computeStreak(entries, today);
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), REMINDER_CHECK_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  const { sessions: sessionsDone } = summarizeWeek(entries, now);
+  const streak = computeStreak(entries, now);
+  const exercisedToday = entries.some((entry) => entry.dateISO === toISODate(now));
+  const reminderTimeReached =
+    now.getHours() > reminderHour || (now.getHours() === reminderHour && now.getMinutes() >= reminderMinute);
+  const showReminderBanner = notificationsEnabled && reminderTimeReached && !exercisedToday;
 
   const openCategory = (category: SequenceCategory) => router.push(`/list/${category}`);
 
@@ -101,6 +115,13 @@ export default function Home() {
         </IconButton>
       </View>
 
+      {showReminderBanner ? (
+        <View style={styles.reminderBanner}>
+          <ClockIcon size={18} color={colors.accentOn} />
+          <Text style={styles.reminderBannerText}>{t.home.reminderBanner}</Text>
+        </View>
+      ) : null}
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.grid}>
           {tiles.map(({ key, title, subtitle, Icon, onPress }) => (
@@ -135,6 +156,23 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.sm,
+  },
+  reminderBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.accent,
+  },
+  reminderBannerText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.accentOn,
   },
   title: {
     color: colors.textPrimary,

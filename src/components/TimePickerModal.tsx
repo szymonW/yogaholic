@@ -1,19 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from '@/i18n';
 import { colors, radius, spacing, typography } from '@/theme';
-import { ChevronLeftIcon, CloseIcon } from './icons';
+import { Button } from './Button';
+import { ChevronLeftIcon } from './icons';
 import { IconButton } from './IconButton';
 
 interface TimePickerModalProps {
   visible: boolean;
   hour: number;
   minute: number;
-  onIncHour: () => void;
-  onDecHour: () => void;
-  onIncMinute: () => void;
-  onDecMinute: () => void;
-  onClose: () => void;
+  onSave: (hour: number, minute: number) => void;
+  onCancel: () => void;
 }
+
+// Minute column moves in 5-minute increments (like a NumberPicker's arrow taps) — a reminder
+// doesn't need minute precision, and 1-minute steps would take up to 59 taps to dial in.
+const MINUTE_STEP = 5;
 
 function pad(n: number) {
   return String(n).padStart(2, '0');
@@ -38,35 +41,51 @@ function TimeColumn({ value, onInc, onDec, incA11y, decA11y }: { value: number; 
   );
 }
 
-export function TimePickerModal({ visible, hour, minute, onIncHour, onDecHour, onIncMinute, onDecMinute, onClose }: TimePickerModalProps) {
+/**
+ * Edits a draft hour/minute independent of the persisted setting — arrow taps only ever
+ * change local state, so "Anuluj" can walk away with the store untouched and "Zapisz" is the
+ * one path that commits (`onSave`).
+ */
+export function TimePickerModal({ visible, hour, minute, onSave, onCancel }: TimePickerModalProps) {
   const t = useTranslation();
+  const [draftHour, setDraftHour] = useState(hour);
+  const [draftMinute, setDraftMinute] = useState(minute);
+
+  // Re-seed the draft from the persisted value each time the modal opens, so a previous
+  // cancelled edit never leaks into the next time it's opened.
+  useEffect(() => {
+    if (visible) {
+      setDraftHour(hour);
+      setDraftMinute(minute);
+    }
+  }, [visible, hour, minute]);
+
   return (
-    <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
-      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} accessibilityLabel={t.common.close} />
+    <Modal transparent visible={visible} animationType="fade" onRequestClose={onCancel}>
+      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onCancel} accessibilityLabel={t.common.cancel} />
       <View style={styles.centerWrap} pointerEvents="box-none">
         <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={[typography.bodyLg, styles.title]}>{t.goals.setReminderTime}</Text>
-            <IconButton accessibilityLabel={t.common.close} onPress={onClose} size={32}>
-              <CloseIcon />
-            </IconButton>
-          </View>
+          <Text style={[typography.bodyLg, styles.title]}>{t.goals.setReminderTime}</Text>
           <View style={styles.picker}>
             <TimeColumn
-              value={hour}
-              onInc={onIncHour}
-              onDec={onDecHour}
+              value={draftHour}
+              onInc={() => setDraftHour((h) => (h + 1) % 24)}
+              onDec={() => setDraftHour((h) => (h + 23) % 24)}
               incA11y={t.stepButton.increaseA11y}
               decA11y={t.stepButton.decreaseA11y}
             />
             <Text style={styles.colon}>:</Text>
             <TimeColumn
-              value={minute}
-              onInc={onIncMinute}
-              onDec={onDecMinute}
+              value={draftMinute}
+              onInc={() => setDraftMinute((m) => (m + MINUTE_STEP) % 60)}
+              onDec={() => setDraftMinute((m) => (m + 60 - MINUTE_STEP) % 60)}
               incA11y={t.stepButton.increaseA11y}
               decA11y={t.stepButton.decreaseA11y}
             />
+          </View>
+          <View style={styles.actions}>
+            <Button title={t.common.cancel} variant="secondary" style={styles.flex1} onPress={onCancel} />
+            <Button title={t.common.save} variant="primary" style={styles.flex1} onPress={() => onSave(draftHour, draftMinute)} />
           </View>
         </View>
       </View>
@@ -92,14 +111,9 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.lg,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xs,
-  },
   title: {
     color: colors.textPrimary,
+    textAlign: 'center',
   },
   picker: {
     flexDirection: 'row',
@@ -131,5 +145,12 @@ const styles = StyleSheet.create({
   },
   chevronDown: {
     transform: [{ rotate: '-90deg' }],
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  flex1: {
+    flex: 1,
   },
 });
