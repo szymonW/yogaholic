@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ProgressBar, ScreenBackground, ScreenHeader } from '@/components';
+import { ProgressBar, ScreenBackground, ScreenHeader, TimePickerModal, Toggle } from '@/components';
 import { useTranslation } from '@/i18n';
-import { useGoalsStore, useHistoryStore } from '@/store';
+import { useGoalsStore, useHistoryStore, useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
 import { computeStreak, summarizeWeek } from '@/utils/history';
 import { goBack } from '@/utils/navigation';
@@ -9,6 +10,8 @@ import { goBack } from '@/utils/navigation';
 export default function GoalsScreen() {
   const t = useTranslation();
   const { goalHistory, goalMinutes, incSessionDay, decSessionDay, incGoalMinutes, decGoalMinutes } = useGoalsStore();
+  const { notificationsEnabled, reminderHour, reminderMinute, toggleNotifications, setReminderTime } = useSettingsStore();
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
   const entries = useHistoryStore((state) => state.entries);
   // The screen only ever edits the current (latest) snapshot — a change never rewrites the past.
   const sessionsPerDay = goalHistory[goalHistory.length - 1].sessionsPerDay;
@@ -78,11 +81,37 @@ export default function GoalsScreen() {
           </View>
         </View>
 
+        <View style={styles.card}>
+          <Pressable
+            style={[styles.cardHeader, styles.reminderHeader]}
+            onPress={toggleNotifications}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: notificationsEnabled }}
+          >
+            <Text style={styles.cardLabel}>{t.goals.reminder}</Text>
+            <Toggle value={notificationsEnabled} />
+          </Pressable>
+          <Pressable onPress={() => setTimePickerVisible(true)} style={styles.reminderTimeButton} hitSlop={spacing.sm}>
+            <Text style={styles.reminderTimeValue}>{t.goals.reminderTime(reminderHour, reminderMinute)}</Text>
+          </Pressable>
+        </View>
+
         <View style={[styles.card, styles.streakCard]}>
           <Text style={styles.cardLabel}>{t.goals.currentStreak}</Text>
           <Text style={styles.streakValue}>{t.goals.streakDays(streak)}</Text>
         </View>
       </View>
+
+      <TimePickerModal
+        visible={timePickerVisible}
+        hour={reminderHour}
+        minute={reminderMinute}
+        onSave={(hour, minute) => {
+          setReminderTime(hour, minute);
+          setTimePickerVisible(false);
+        }}
+        onCancel={() => setTimePickerVisible(false)}
+      />
     </ScreenBackground>
   );
 }
@@ -104,6 +133,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
+  },
+  // The label sits next to a Toggle switch, not another line of text, so it's centered on the
+  // switch rather than aligned to its (nonexistent) text baseline.
+  reminderHeader: {
+    alignItems: 'center',
   },
   cardLabel: {
     fontSize: 16,
@@ -167,6 +201,23 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textSecondary,
     minWidth: 60,
+    textAlign: 'center',
+  },
+  reminderTimeButton: {
+    alignSelf: 'center',
+    // Card already puts `gap: spacing.md` above this button; add the difference so its distance
+    // from the label matches its distance from the card's bottom edge (padding: spacing.lg + 2).
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
+    backgroundColor: colors.background,
+  },
+  reminderTimeValue: {
+    fontSize: 40,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+    color: colors.accent,
     textAlign: 'center',
   },
   streakCard: {

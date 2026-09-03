@@ -86,6 +86,7 @@ export const en: Translations = {
   common: {
     close: 'Close',
     cancel: 'Cancel',
+    save: 'Save',
     delete: 'Delete',
     back: 'Back',
   },
@@ -116,6 +117,7 @@ export const en: Translations = {
     sequencesCount: (n: number) => (n === 1 ? '1 sequence' : `${n} sequences`),
     streakDays: (n: number) => `${n}-day streak`,
     weekProgress: (done: number, goal: number) => `${done}/${goal} this week`,
+    reminderBanner: "Time to practice! You haven't exercised today yet.",
   },
   list: {
     newSequence: '+ New sequence',
@@ -213,6 +215,9 @@ export const en: Translations = {
     perWeek: (n: number) => `${n} / wk`,
     minutesPerWeek: 'Minutes per week',
     goalMinutes: (n: number) => `goal: ${n}`,
+    reminder: 'Remind me to exercise',
+    reminderTime: (hour: number, minute: number) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
+    setReminderTime: 'Set reminder time',
     currentStreak: 'Current streak',
     streakDays: (n: number) => (n === 1 ? '1 day' : `${n} days`),
   },

@@ -86,6 +86,7 @@ export const pl = {
   common: {
     close: 'Zamknij',
     cancel: 'Anuluj',
+    save: 'Zapisz',
     delete: 'Usuń',
     back: 'Wstecz',
   },
@@ -116,6 +117,7 @@ export const pl = {
     sequencesCount: (n: number) => `${n} sekwencji`,
     streakDays: (n: number) => `seria ${n} dni`,
     weekProgress: (done: number, goal: number) => `${done}/${goal} w tym tyg.`,
+    reminderBanner: 'Czas na ćwiczenia! Dziś jeszcze nie ćwiczyłeś.',
   },
   list: {
     newSequence: '+ Nowa sekwencja',
@@ -212,6 +214,9 @@ export const pl = {
     perWeek: (n: number) => `${n} / tyg.`,
     minutesPerWeek: 'Minuty w tygodniu',
     goalMinutes: (n: number) => `cel: ${n}`,
+    reminder: 'Przypomnij mi o ćwiczeniach',
+    reminderTime: (hour: number, minute: number) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
+    setReminderTime: 'Ustaw godzinę przypomnienia',
     currentStreak: 'Aktualna seria',
     streakDays: (n: number) => `${n} dni`,
   },
