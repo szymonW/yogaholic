@@ -10,7 +10,7 @@ import type { Sequence } from '@/types';
  * re-syncs immediately when the app returns from the background (tick() itself is
  * timestamp-based, so a single catch-up tick is enough after any amount of time away).
  */
-export function useRunTimer(sequence: Sequence | undefined) {
+export function useRunTimer(sequence: Sequence | undefined, repeatCount: number = 1) {
   const prepSeconds = useSettingsStore((state) => state.prepCountdownSeconds);
   const pushRecent = useSequencesStore((state) => state.pushRecent);
 
@@ -23,15 +23,15 @@ export function useRunTimer(sequence: Sequence | undefined) {
   const exercises = useRunStore((state) => state.exercises);
 
   const startedForId = useRef<string | null>(null);
-  const latest = useRef({ prepSeconds, pushRecent });
+  const latest = useRef({ prepSeconds, pushRecent, repeatCount });
   useEffect(() => {
-    latest.current = { prepSeconds, pushRecent };
+    latest.current = { prepSeconds, pushRecent, repeatCount };
   });
 
   useEffect(() => {
     if (!sequence || startedForId.current === sequence.id) return;
     startedForId.current = sequence.id;
-    useRunStore.getState().start(sequence, latest.current.prepSeconds);
+    useRunStore.getState().start(sequence, latest.current.prepSeconds, latest.current.repeatCount);
     latest.current.pushRecent(sequence.id);
   }, [sequence]);
 

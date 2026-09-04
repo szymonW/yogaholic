@@ -8,14 +8,15 @@ import { useSequencesStore } from '@/store/sequencesStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { colors, spacing, typography } from '@/theme';
 import { goBack } from '@/utils/navigation';
-import { totalDuration } from '@/utils/time';
+import { formatDuration } from '@/utils/time';
 
 export default function CompleteScreen() {
   const t = useTranslation();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, repeat } = useLocalSearchParams<{ id: string; repeat?: string }>();
   const sequence = useSequencesStore((state) => state.getById(id));
   const pushRecent = useSequencesStore((state) => state.pushRecent);
   const prepSeconds = useSettingsStore((state) => state.prepCountdownSeconds);
+  const repeatCount = Math.min(9, Math.max(1, Number.parseInt(repeat ?? '1', 10) || 1));
 
   if (!sequence) {
     return (
@@ -25,10 +26,13 @@ export default function CompleteScreen() {
     );
   }
 
+  const positionCount = sequence.exercises.length * repeatCount;
+  const totalSeconds = sequence.exercises.reduce((sum, exercise) => sum + exercise.duration, 0) * repeatCount;
+
   const handleRestart = () => {
-    useRunStore.getState().start(sequence, prepSeconds);
+    useRunStore.getState().start(sequence, prepSeconds, repeatCount);
     pushRecent(sequence.id);
-    router.replace(`/run/${sequence.id}`);
+    router.replace(repeatCount > 1 ? `/run/${sequence.id}?repeat=${repeatCount}` : `/run/${sequence.id}`);
   };
 
   const handleBackToList = () => {
@@ -46,11 +50,11 @@ export default function CompleteScreen() {
 
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{sequence.exercises.length}</Text>
+          <Text style={styles.statValue}>{positionCount}</Text>
           <Text style={styles.statLabel}>{t.complete.positions}</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{totalDuration(sequence.exercises)}</Text>
+          <Text style={styles.statValue}>{formatDuration(totalSeconds)}</Text>
           <Text style={styles.statLabel}>{t.complete.time}</Text>
         </View>
       </View>

@@ -6,9 +6,11 @@ import { useTranslation } from '@/i18n';
 import { selectSequencesForCategory, useHistoryStore, useSequencesStore } from '@/store';
 import { colors, spacing } from '@/theme';
 import type { SequenceCategory } from '@/types';
-import { formatRelativeDays, getLastPracticedDate } from '@/utils/history';
+import { formatRelativeDays, getLastPracticedEntry } from '@/utils/history';
 import { goBack } from '@/utils/navigation';
-import { totalDuration } from '@/utils/time';
+import { formatDuration } from '@/utils/time';
+
+const MAX_REPEAT_COUNT = 9;
 
 export default function ListScreen() {
   const t = useTranslation();
@@ -24,11 +26,18 @@ export default function ListScreen() {
   const toggleFavorite = useSequencesStore((state) => state.toggleFavorite);
   const historyEntries = useHistoryStore((state) => state.entries);
   const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
+  const [repeatCounts, setRepeatCounts] = useState<Record<string, number>>({});
 
   const sequences = selectSequencesForCategory(category, { customSequences, recentIds, favoriteIds });
   const customIds = new Set(customSequences.map((sequence) => sequence.id));
   const favoriteIdSet = new Set(favoriteIds);
   const today = new Date();
+
+  const cycleRepeatCount = (id: string) =>
+    setRepeatCounts((prev) => {
+      const current = prev[id] ?? 1;
+      return { ...prev, [id]: current >= MAX_REPEAT_COUNT ? 1 : current + 1 };
+    });
 
   return (
     <ScreenBackground style={styles.root}>
@@ -44,21 +53,30 @@ export default function ListScreen() {
         {sequences.length === 0 ? <Text style={styles.empty}>{t.list.empty}</Text> : null}
 
         {sequences.map((sequence) => {
-          const lastPracticed = isRecent ? getLastPracticedDate(historyEntries, sequence.id) : undefined;
+          const lastEntry = isRecent ? getLastPracticedEntry(historyEntries, sequence.id) : undefined;
+          const lastLabel = lastEntry
+            ? lastEntry.repeatCount && lastEntry.repeatCount > 1
+              ? `${formatRelativeDays(lastEntry.dateISO, today, t.history)} (x${lastEntry.repeatCount})`
+              : formatRelativeDays(lastEntry.dateISO, today, t.history)
+            : undefined;
           const editable = customIds.has(sequence.id);
           const title = t.sequences[sequence.id] ?? sequence.title;
+          const repeatCount = repeatCounts[sequence.id] ?? 1;
+          const totalSeconds = sequence.exercises.reduce((sum, exercise) => sum + exercise.duration, 0) * repeatCount;
           return (
             <SequenceCard
               key={sequence.id}
               title={title}
-              subtitle={t.list.subtitleDetail(sequence.exercises.length, totalDuration(sequence.exercises))}
-              lastLabel={lastPracticed ? formatRelativeDays(lastPracticed, today, t.history) : undefined}
-              onStart={() => router.push(`/run/${sequence.id}`)}
+              subtitle={t.list.subtitleDetail(sequence.exercises.length * repeatCount, formatDuration(totalSeconds))}
+              lastLabel={lastLabel}
+              onStart={() => router.push(repeatCount > 1 ? `/run/${sequence.id}?repeat=${repeatCount}` : `/run/${sequence.id}`)}
               onOpenDetail={() => router.push(editable ? `/create?id=${sequence.id}` : `/detail/${sequence.id}`)}
               isEditable={editable}
               onDelete={isCustom ? () => setPendingDelete({ id: sequence.id, title }) : undefined}
               isFavorite={favoriteIdSet.has(sequence.id)}
               onToggleFavorite={() => toggleFavorite(sequence.id)}
+              repeatCount={repeatCount}
+              onChangeRepeatCount={() => cycleRepeatCount(sequence.id)}
             />
           );
         })}

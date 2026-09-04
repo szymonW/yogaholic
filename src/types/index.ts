@@ -28,6 +28,8 @@ export interface HistoryEntry {
   startedAtMs: number;
   durationSeconds: number;
   exerciseCount: number;
+  /** Repetition multiplier the sequence was run at (x1–x9); omitted/1 for a normal single run. */
+  repeatCount?: number;
 }
 
 export type CalendarEventStatus = 'done' | 'planned';

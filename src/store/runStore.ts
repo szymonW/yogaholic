@@ -17,7 +17,7 @@ interface RunState {
   /** ms epoch as of the last tick — the only field whose change forces a re-render for the countdown */
   now: number;
 
-  start: (sequence: Sequence, prepSeconds: number) => void;
+  start: (sequence: Sequence, prepSeconds: number, repeatCount?: number) => void;
   tick: () => void;
   togglePause: () => void;
   skip: () => void;
@@ -50,14 +50,16 @@ const IDLE: Omit<RunState, 'start' | 'tick' | 'togglePause' | 'skip' | 'previous
 export const useRunStore = create<RunState>()((set, get) => ({
   ...IDLE,
 
-  start: (sequence, prepSeconds) => {
+  start: (sequence, prepSeconds, repeatCount = 1) => {
     const now = Date.now();
+    const rounds = Math.min(9, Math.max(1, repeatCount));
+    const exercises = Array.from({ length: rounds }, () => sequence.exercises).flat();
     set({
       sequenceId: sequence.id,
-      exercises: withPoolImages(sequence.exercises),
+      exercises: withPoolImages(exercises),
       prepSeconds,
       runIndex: 0,
-      phase: sequence.exercises.length > 0 ? 'prep' : 'complete',
+      phase: exercises.length > 0 ? 'prep' : 'complete',
       phaseEndsAt: now + prepSeconds * 1000,
       paused: false,
       pausedRemainingMs: 0,

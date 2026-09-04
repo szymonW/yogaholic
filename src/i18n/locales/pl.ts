@@ -241,6 +241,8 @@ export const pl = {
     edit: 'Edytuj',
     details: 'Szczegóły',
     deleteA11y: (title: string) => `Usuń ${title}`,
+    repeatCountLabel: (count: number) => `x${count}`,
+    repeatCountA11y: (count: number) => `Powtórzenia: x${count}. Dotknij, aby zmienić.`,
   },
   stepButton: {
     increaseA11y: 'Zwiększ czas',
