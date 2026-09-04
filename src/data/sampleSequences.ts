@@ -1,20 +1,4 @@
-import type { Exercise, Sequence } from '@/types';
-
-// One Surya Namaskar round — repeated 4x to build the full 48-step sequence below.
-const SUN_SALUTATION_ROUND: Exercise[] = [
-  { name: 'Pozycja góry (Tadasana)', duration: 15 },
-  { name: 'Uniesienie rąk (Urdhva Hastasana)', duration: 10 },
-  { name: 'Skłon w przód (Uttanasana)', duration: 15 },
-  { name: 'Półskłon (Ardha Uttanasana)', duration: 10 },
-  { name: 'Deska (Phalakasana)', duration: 15 },
-  { name: 'Pozycja kija na czterech kończynach (Chaturanga Dandasana)', duration: 10 },
-  { name: 'Pies z głową w górę (Urdhva Mukha Svanasana)', duration: 15 },
-  { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 30 },
-  { name: 'Półskłon (Ardha Uttanasana)', duration: 10 },
-  { name: 'Skłon w przód (Uttanasana)', duration: 15 },
-  { name: 'Uniesienie rąk (Urdhva Hastasana)', duration: 10 },
-  { name: 'Pozycja góry (Tadasana)', duration: 15 },
-];
+import type { Sequence } from '@/types';
 
 // Ported 1:1 from the approved Claude Design mockup (const BASE_SEQUENCES).
 // Immutable, app-provided sequences. Favoriting ("saved") is tracked separately,
@@ -77,7 +61,19 @@ export const BASE_SEQUENCES: Sequence[] = [
     id: 's6',
     title: 'Powitanie Słońca (Surya Namaskar)',
     tags: ['sample'],
-    exercises: [...SUN_SALUTATION_ROUND, ...SUN_SALUTATION_ROUND, ...SUN_SALUTATION_ROUND, ...SUN_SALUTATION_ROUND],
+    exercises: [
+      { name: 'Uniesienie rąk (Urdhva Hastasana)', duration: 10 },
+      { name: 'Skłon w przód (Uttanasana)', duration: 15 },
+      { name: 'Półskłon (Ardha Uttanasana)', duration: 10 },
+      { name: 'Deska (Phalakasana)', duration: 15 },
+      { name: 'Pozycja kija na czterech kończynach (Chaturanga Dandasana)', duration: 10 },
+      { name: 'Pies z głową w górę (Urdhva Mukha Svanasana)', duration: 15 },
+      { name: 'Pies z głową w dół (Adho Mukha Svanasana)', duration: 30 },
+      { name: 'Półskłon (Ardha Uttanasana)', duration: 10 },
+      { name: 'Skłon w przód (Uttanasana)', duration: 15 },
+      { name: 'Uniesienie rąk (Urdhva Hastasana)', duration: 10 },
+      { name: 'Pozycja góry (Tadasana)', duration: 15 },
+    ],
   },
   {
     id: 's7',

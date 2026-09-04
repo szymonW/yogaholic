@@ -66,6 +66,14 @@ export function getLastPracticedDate(entries: HistoryEntry[], sequenceId: string
     .at(-1);
 }
 
+/** Most recent completed session for a sequence (full entry, so its repeatCount is available), or undefined if it was never run. */
+export function getLastPracticedEntry(entries: HistoryEntry[], sequenceId: string): HistoryEntry | undefined {
+  return entries
+    .filter((entry) => entry.sequenceId === sequenceId)
+    .sort((a, b) => a.startedAtMs - b.startedAtMs)
+    .at(-1);
+}
+
 export interface RelativeDaysLabels {
   today: string;
   yesterday: string;

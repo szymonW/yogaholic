@@ -242,6 +242,8 @@ export const en: Translations = {
     edit: 'Edit',
     details: 'Details',
     deleteA11y: (title: string) => `Delete ${title}`,
+    repeatCountLabel: (count: number) => `x${count}`,
+    repeatCountA11y: (count: number) => `Repetitions: x${count}. Tap to change.`,
   },
   stepButton: {
     increaseA11y: 'Increase time',

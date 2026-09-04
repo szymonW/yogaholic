@@ -56,6 +56,42 @@ describe('SequenceCard', () => {
     expect(screen.getByText('Ostatnio: wczoraj')).toBeTruthy();
   });
 
+  it('shows the repeat-count button only when onChangeRepeatCount is provided, defaulting to x1', async () => {
+    const onChangeRepeatCount = jest.fn();
+    const { rerender } = await render(
+      <SequenceCard title="A" subtitle="s" onStart={jest.fn()} onOpenDetail={jest.fn()} isEditable={false} />
+    );
+    expect(screen.queryByText('x1')).toBeNull();
+
+    await rerender(
+      <SequenceCard
+        title="A"
+        subtitle="s"
+        onStart={jest.fn()}
+        onOpenDetail={jest.fn()}
+        isEditable={false}
+        onChangeRepeatCount={onChangeRepeatCount}
+      />
+    );
+    await fireEvent.press(screen.getByText('x1'));
+    expect(onChangeRepeatCount).toHaveBeenCalledTimes(1);
+  });
+
+  it('reflects the current repeatCount in its label', async () => {
+    await render(
+      <SequenceCard
+        title="A"
+        subtitle="s"
+        onStart={jest.fn()}
+        onOpenDetail={jest.fn()}
+        isEditable={false}
+        repeatCount={3}
+        onChangeRepeatCount={jest.fn()}
+      />
+    );
+    expect(screen.getByText('x3')).toBeTruthy();
+  });
+
   it('shows the delete button only when onDelete is provided, and calls it', async () => {
     const onDelete = jest.fn();
     const { rerender } = await render(

@@ -7,7 +7,13 @@ import { storage } from './storage';
 interface HistoryState {
   /** One entry per completed run — feeds streak, weekly goals and the calendar's "done" days. */
   entries: HistoryEntry[];
-  logSession: (input: { sequenceId: string; durationSeconds: number; exerciseCount: number; date?: Date }) => void;
+  logSession: (input: {
+    sequenceId: string;
+    durationSeconds: number;
+    exerciseCount: number;
+    repeatCount?: number;
+    date?: Date;
+  }) => void;
 }
 
 // v1 added HistoryEntry.startedAtMs — backfill it for entries persisted before that field existed,
@@ -28,7 +34,7 @@ export const useHistoryStore = create<HistoryState>()(
   persist(
     (set) => ({
       entries: [],
-      logSession: ({ sequenceId, durationSeconds, exerciseCount, date = new Date() }) => {
+      logSession: ({ sequenceId, durationSeconds, exerciseCount, repeatCount = 1, date = new Date() }) => {
         const entry: HistoryEntry = {
           id: `h${Date.now()}`,
           sequenceId,
@@ -37,6 +43,7 @@ export const useHistoryStore = create<HistoryState>()(
           startedAtMs: date.getTime() - durationSeconds * 1000,
           durationSeconds,
           exerciseCount,
+          repeatCount,
         };
         set((state) => ({ entries: [...state.entries, entry] }));
       },

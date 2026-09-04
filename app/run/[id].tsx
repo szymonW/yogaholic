@@ -21,10 +21,11 @@ const PREP_BEEP_SOUND = require('../../assets/sounds/Beep Short .mp3');
 
 export default function RunScreen() {
   const t = useTranslation();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, repeat } = useLocalSearchParams<{ id: string; repeat?: string }>();
   const insets = useSafeAreaInsets();
   const sequence = useSequencesStore((state) => state.getById(id));
   const logSession = useHistoryStore((state) => state.logSession);
+  const repeatCount = Math.min(9, Math.max(1, Number.parseInt(repeat ?? '1', 10) || 1));
 
   const {
     phase,
@@ -39,7 +40,7 @@ export default function RunScreen() {
     skip,
     previous,
     canGoPrevious,
-  } = useRunTimer(sequence);
+  } = useRunTimer(sequence, repeatCount);
 
   const instructorVoiceEnabled = useSettingsStore((state) => state.instructorVoiceEnabled);
   const prepBeep = useAudioPlayer(PREP_BEEP_SOUND);
@@ -49,9 +50,9 @@ export default function RunScreen() {
     if (phase !== 'complete' || !sequence) return;
     if (isCasting) sendRunState(CAST_COMPLETE_MESSAGE);
     const durationSeconds = exercises.reduce((sum, exercise) => sum + exercise.duration, 0);
-    logSession({ sequenceId: sequence.id, durationSeconds, exerciseCount: exercises.length });
-    router.replace(`/complete/${sequence.id}`);
-  }, [phase, sequence, exercises, logSession, isCasting, sendRunState]);
+    logSession({ sequenceId: sequence.id, durationSeconds, exerciseCount: exercises.length, repeatCount });
+    router.replace(repeatCount > 1 ? `/complete/${sequence.id}?repeat=${repeatCount}` : `/complete/${sequence.id}`);
+  }, [phase, sequence, exercises, logSession, isCasting, sendRunState, repeatCount]);
 
   // One beep per counted-down second during "Przygotuj się", plus a single beep the moment
   // the exercise itself starts. Keyed by phase+runIndex(+remainingSeconds during prep) and

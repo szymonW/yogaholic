@@ -17,6 +17,10 @@ interface SequenceCardProps {
   isFavorite?: boolean;
   /** Only shown when provided — toggles the sequence's favorite status. */
   onToggleFavorite?: () => void;
+  /** Repetition multiplier (x1–x9) the sequence will run at. Defaults to 1. */
+  repeatCount?: number;
+  /** Only shown (and the multiplier cyclable) when provided — advances repeatCount, wrapping from x9 back to x1. */
+  onChangeRepeatCount?: () => void;
 }
 
 export function SequenceCard({
@@ -29,6 +33,8 @@ export function SequenceCard({
   onDelete,
   isFavorite,
   onToggleFavorite,
+  repeatCount = 1,
+  onChangeRepeatCount,
 }: SequenceCardProps) {
   const t = useTranslation();
   return (
@@ -58,6 +64,16 @@ export function SequenceCard({
         <Pressable onPress={onOpenDetail} style={({ pressed }) => [styles.detailButton, pressed && styles.pressed]}>
           <Text style={styles.detailLabel}>{isEditable ? t.sequenceCard.edit : t.sequenceCard.details}</Text>
         </Pressable>
+        {onChangeRepeatCount ? (
+          <Pressable
+            onPress={onChangeRepeatCount}
+            accessibilityRole="button"
+            accessibilityLabel={t.sequenceCard.repeatCountA11y(repeatCount)}
+            style={({ pressed }) => [styles.repeatButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.repeatLabel}>{t.sequenceCard.repeatCountLabel(repeatCount)}</Text>
+          </Pressable>
+        ) : null}
         {onDelete ? (
           <Pressable
             onPress={onDelete}
@@ -147,5 +163,18 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  repeatButton: {
+    width: 42,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  repeatLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
 });
