@@ -4,7 +4,7 @@ import { ProgressBar, ScreenBackground, ScreenHeader, TimePickerModal, Toggle } 
 import { useTranslation } from '@/i18n';
 import { useGoalsStore, useHistoryStore, useSettingsStore } from '@/store';
 import { colors, radius, spacing } from '@/theme';
-import { computeStreak, summarizeWeek } from '@/utils/history';
+import { computeLongestStreak, computeStreak, summarizeWeek } from '@/utils/history';
 import { goBack } from '@/utils/navigation';
 
 export default function GoalsScreen() {
@@ -19,6 +19,7 @@ export default function GoalsScreen() {
   const today = new Date();
   const { minutes: minutesDone } = summarizeWeek(entries, today);
   const streak = computeStreak(entries, today);
+  const longestStreak = computeLongestStreak(entries);
   const goalSessionsTotal = sessionsPerDay.reduce((sum, count) => sum + count, 0);
 
   return (
@@ -96,9 +97,15 @@ export default function GoalsScreen() {
           </Pressable>
         </View>
 
-        <View style={[styles.card, styles.streakCard]}>
-          <Text style={styles.cardLabel}>{t.goals.currentStreak}</Text>
-          <Text style={styles.streakValue}>{t.goals.streakDays(streak)}</Text>
+        <View style={styles.card}>
+          <View style={styles.streakRow}>
+            <Text style={styles.cardLabel}>{t.goals.currentStreak}</Text>
+            <Text style={styles.streakValue}>{t.goals.streakDays(streak)}</Text>
+          </View>
+          <View style={styles.streakRow}>
+            <Text style={styles.cardLabel}>{t.goals.longestStreak}</Text>
+            <Text style={styles.streakValue}>{t.goals.streakDays(longestStreak)}</Text>
+          </View>
         </View>
       </View>
 
@@ -207,7 +214,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     // Card already puts `gap: spacing.md` above this button; add the difference so its distance
     // from the label matches its distance from the card's bottom edge (padding: spacing.lg + 2).
-    marginTop: spacing.xs,
+    // Pulled up a couple px from that exact math: the 40px numeric glyphs have no descenders,
+    // so their visual weight sits higher in the box than the padding alone accounts for.
+    marginTop: spacing.xxs,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xs,
     borderRadius: radius.md,
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
     color: colors.accent,
     textAlign: 'center',
   },
-  streakCard: {
+  streakRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

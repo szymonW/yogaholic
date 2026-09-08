@@ -2,6 +2,7 @@ import { pl } from '@/i18n/locales/pl';
 import type { HistoryEntry } from '@/types';
 import {
   addDays,
+  computeLongestStreak,
   computeStreak,
   formatRelativeDays,
   getLastPracticedDate,
@@ -93,6 +94,34 @@ describe('computeStreak', () => {
   it('is 0 when there is no recent activity', () => {
     const today = new Date(2026, 7, 5);
     expect(computeStreak([entry('2026-07-01')], today)).toBe(0);
+  });
+});
+
+describe('computeLongestStreak', () => {
+  it('finds the longest run even if it is not the most recent one', () => {
+    const entries = [
+      entry('2026-08-01'),
+      entry('2026-08-02'),
+      entry('2026-08-03'),
+      // gap
+      entry('2026-08-10'),
+      entry('2026-08-11'),
+    ];
+    expect(computeLongestStreak(entries)).toBe(3);
+  });
+
+  it('counts an ongoing streak as the longest when it is', () => {
+    const entries = [entry('2026-08-01'), entry('2026-08-04'), entry('2026-08-05'), entry('2026-08-06')];
+    expect(computeLongestStreak(entries)).toBe(3);
+  });
+
+  it('ignores entry order and duplicate dates', () => {
+    const entries = [entry('2026-08-03'), entry('2026-08-01'), entry('2026-08-02', 300, 's2')];
+    expect(computeLongestStreak(entries)).toBe(3);
+  });
+
+  it('is 0 for no history', () => {
+    expect(computeLongestStreak([])).toBe(0);
   });
 });
 
