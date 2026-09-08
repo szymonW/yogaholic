@@ -207,7 +207,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     // Card already puts `gap: spacing.md` above this button; add the difference so its distance
     // from the label matches its distance from the card's bottom edge (padding: spacing.lg + 2).
-    marginTop: spacing.xs,
+    // Pulled up a couple px from that exact math: the 40px numeric glyphs have no descenders,
+    // so their visual weight sits higher in the box than the padding alone accounts for.
+    marginTop: spacing.xxs,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xs,
     borderRadius: radius.md,
