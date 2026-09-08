@@ -57,6 +57,22 @@ export function computeStreak(entries: HistoryEntry[], today: Date): number {
   return streak;
 }
 
+/** Longest run of consecutive practiced days across all history, regardless of whether it's still ongoing. */
+export function computeLongestStreak(entries: HistoryEntry[]): number {
+  const doneDates = [...new Set(entries.map((entry) => entry.dateISO))].sort();
+
+  let longest = 0;
+  let current = 0;
+  let previous: Date | undefined;
+  for (const iso of doneDates) {
+    const date = parseISODate(iso);
+    current = previous && addDays(previous, 1).getTime() === date.getTime() ? current + 1 : 1;
+    longest = Math.max(longest, current);
+    previous = date;
+  }
+  return longest;
+}
+
 /** Most recent completion date for a sequence, or undefined if it was never run. */
 export function getLastPracticedDate(entries: HistoryEntry[], sequenceId: string): string | undefined {
   return entries

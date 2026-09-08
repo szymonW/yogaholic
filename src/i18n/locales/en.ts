@@ -219,6 +219,7 @@ export const en: Translations = {
     reminderTime: (hour: number, minute: number) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
     setReminderTime: 'Set reminder time',
     currentStreak: 'Current streak',
+    longestStreak: 'Longest streak',
     streakDays: (n: number) => (n === 1 ? '1 day' : `${n} days`),
   },
   history: {

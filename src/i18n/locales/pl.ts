@@ -218,6 +218,7 @@ export const pl = {
     reminderTime: (hour: number, minute: number) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
     setReminderTime: 'Ustaw godzinę przypomnienia',
     currentStreak: 'Aktualna seria',
+    longestStreak: 'Najdłuższa seria',
     streakDays: (n: number) => `${n} dni`,
   },
   history: {
